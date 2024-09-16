@@ -10,6 +10,9 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: '#8B4513', // Saddle Brown
+        secondary: '#F5DEB3', // Wheat
+        accent: '#228B22', // Forest Green
       },
     },
   },
