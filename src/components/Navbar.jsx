@@ -3,28 +3,15 @@ import Image from 'next/image'
 import logo from "../Image/logo.png"
 import profile from "../Image/profile.avif"
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, HeartIcon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 
 
 const Navbar = () => {
     const navigation = [
-        // { name: 'Team', href: '#', current: false },
         { name: 'About us', href: '/about', current: false },
-        // { name: 'Calendar', href: '#', current: false },
-    ]
-
-    const CategoriesNavigation = [
-        { name: 'Millet Snacks - Savouries', href: '#', current: false, img: "" },
-        { name: 'Sprouted Flours', href: '#', current: false, img: "" },
-        { name: "Freshly Ground Flour's & Attas's", href: '#', current: false, img: "" },
-        { name: "Freshly Ground Masala & chutney podi", href: '#', current: false, img: "" },
-        { name: 'Whole Millets & Millet Flours', href: '#', current: false, img: "" },
-        { name: 'Activated | Soaked Flours', href: '#', current: false, img: "" },
-        { name: 'Instant Ready Mixes', href: '#', current: false, img: "" },
-        { name: 'Healthy Mix & Nuts Powder', href: '#', current: false, img: "" },
-        { name: 'Herbal Hair oil', href: '#', current: false, img: "" },
-        { name: 'Cold Pressed Oil', href: '#', current: false, img: "" },
+        { name: 'Contact us', href: '/contact', current: false },
+        // { name: 'Team', href: '#', current: false },
     ]
 
     function classNames(...classes) {
@@ -62,25 +49,7 @@ const Navbar = () => {
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             <div className="hidden sm:ml-6 sm:block">
                                 <div className="flex">
-                                    <Menu as="div" className="">
-                                        <div>
-                                            <MenuButton className="hover:bg-primary text-gray-900 hover:text-white text-sm font-medium py-2 px-3 rounded-md">
-                                                Categories
-                                            </MenuButton>
-                                            <MenuItems
-                                                transition
-                                                className="grid grid-flow-row grid-cols-2 absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-                                            >
-                                                {CategoriesNavigation.map((item) => (
-                                                    <MenuItem key={item.name}>
-                                                        <Link href={item.href} className="block px-4 py-2 text-sm font-medium text-gray-900 hover:text-white hover:bg-primary hover:rounded-md">
-                                                            {item.name}
-                                                        </Link>
-                                                    </MenuItem>
-                                                ))}
-                                            </MenuItems>
-                                        </div>
-                                    </Menu>
+                                    
                                     {navigation.map((item) => (
                                         <a
                                             key={item.name}
@@ -96,6 +65,14 @@ const Navbar = () => {
                                     ))}
                                 </div>
                             </div>
+                            <button
+                                type="button"
+                                className="relative rounded-full p-1 text-gray-900 hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                            >
+                                <span className="absolute -inset-1.5" />
+                                <span className="sr-only">Wishlist</span>
+                                <HeartIcon aria-hidden="true" className="h-6 w-6" />
+                            </button>
                             <button
                                 type="button"
                                 className="relative rounded-full p-1 text-gray-900 hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
