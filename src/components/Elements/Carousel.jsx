@@ -15,8 +15,8 @@ const Carousel = ({ images, autoSlide = true, autoSlideInterval = 3000 }) => {
 
 
     return (
-        <div className="relative w-full max-w-[830px] mx-auto">
-            <div className="relative h-64">
+        <div className="relative w-full max-w-[830px] mx-auto mb-2">
+            <div className="relative">
                 {images.map((image, index) => (
                     <div
                         key={index}

@@ -1,54 +1,132 @@
-import React from 'react'
+import React, { useState } from 'react';
 import {
     Card as CardLayout,
     CardHeader,
     CardBody,
     CardFooter,
     Typography,
-    Button,
-} from "@material-tailwind/react";
-import Image from 'next/image'
+} from '@material-tailwind/react';
+import { HeartIcon } from "@heroicons/react/24/outline";
+import Image from 'next/image';
+import Button from '../UI/Button';
+import { useRouter } from 'next/router';
+import CardDetails from './CardDetails';
 
-const Card = ({ product }) => {
+const Card = ({ product, categoryName }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isPopoverVisible, setIsPopoverVisible] = useState(false); // State to manage popover visibility
+    const router = useRouter();
+
+    const productImage =
+        product.oneImg || product.mainImage || (product.images && product.images[0]);
+    const productName = product.name || 'No Name Available';
+    const availableVariants = product.variants || [];
+    const formattedVariants = availableVariants.map(variant => ({
+        size: variant.name,
+        price: variant.price,
+        offerPrice: variant.offerPrice,
+    }));
+
+    const getRandomHashtag = (keywords) => {
+        if (!keywords || keywords.length === 0) return '#NewArrivals';
+        const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
+        return `#${randomKeyword.replace(/\s+/g, '').replace(/[^a-zA-Z0-9_]/g, '')}`;
+    };
+
+    const randomHashtag = getRandomHashtag(product.keywords);
+
+    const handleAddToCart = () => {
+        router.push(`/cardDetail/${product.id}`);
+    };
+
+    const togglePopover = () => {
+        setIsPopoverVisible(!isPopoverVisible); // Toggle popover visibility
+    };
+
+    const closePopover = () => {
+        setIsPopoverVisible(false); // Close the popover
+    };
+
     return (
-        <>
-            <CardLayout className="w-96">
-                <CardHeader shadow={false} floated={false} className="h-96">
+        <div className="relative group"  onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}>
+            <CardLayout
+                className="bg-secondary bg-opacity-25 transition-transform duration-300"
+                onClick={togglePopover} // Toggle popover on click
+            >
+                <CardHeader shadow={false} floated={false} className="relative h-44">
                     <Image
-                        src={product.image}
-                        alt="card-image"
-                        className="h-full w-full object-cover"
+                        src={productImage}
+                        alt={productName}
+                        className="h-auto max-w-full rounded-lg"
+                        layout="fill"
+                        objectFit="cover"
                     />
                 </CardHeader>
                 <CardBody>
-                    <div className="mb-2 flex items-center justify-between">
-                        <Typography color="blue-gray" className="font-medium">
-                            {product.name}
-                        </Typography>
-                        <Typography color="blue-gray" className="font-medium">
-                            Rs. {product.price}
+                    <div className="mb-1 flex items-center justify-between">
+                        <Typography color="gray" className="font-small text-gray-400">
+                            {categoryName}
                         </Typography>
                     </div>
-                    <Typography
-                        variant="small"
-                        color="gray"
-                        className="font-normal opacity-75"
-                    >
-                        {product.description}
-                    </Typography>
+                    <div className="mb-2 flex items-center justify-between">
+                        <Typography color="blue-gray" className="cursor-default font-semibold truncate whitespace-nowrap">
+                            {productName}
+                        </Typography>
+                    </div>
+                    {formattedVariants.length > 0 && (
+                        <div className="mt-4">
+                            <Typography variant="small" color="blue-gray" className="font-medium">
+                                Available Sizes and Prices:
+                            </Typography>
+                            <ul className="mt-2">
+                                <li className="text-gray-700">
+                                    <span className="text-gray-400 line-through text-sm">
+                                        Rs. {formattedVariants[0].price}
+                                    </span>
+                                    <span className="text-red-600 text-lg ml-2">
+                                        Rs. {formattedVariants[0].offerPrice}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    )}
                 </CardBody>
-                <CardFooter className="pt-0">
-                    <Button
-                        ripple={false}
-                        fullWidth={true}
-                        className="bg-blue-gray-900/10 text-blue-gray-900 shadow-none hover:scale-105 hover:shadow-none focus:scale-105 focus:shadow-none active:scale-100"
-                    >
-                        Add to Cart
-                    </Button>
-                </CardFooter>
+                {isHovered ? (
+                    <CardFooter className="pt-0 transition-opacity duration-300 flex justify-between align-middle">
+                        <Button text={"Add to Cart"} onClick={handleAddToCart} />
+                        <HeartIcon className="h-6 w-6 hover:fill-primary cursor-pointer" />
+                    </CardFooter>
+                ) : (
+                    <span className="inline-block bg-gray-200 rounded-full transition-opacity duration-300 px-3 py-1 ml-3 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                        {randomHashtag}
+                    </span>
+                )}
             </CardLayout>
-        </>
-    )
-}
 
-export default Card
+            {/* Conditionally render the CardDetails popover based on isPopoverVisible state */}
+            {isPopoverVisible && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+                    onClick={closePopover} // Close when clicking outside
+                >
+                    <div
+                        className="bg-white p-6 rounded-lg shadow-lg w-full max-w-6xl h-3/4 overflow-auto"
+                        onClick={(e) => e.stopPropagation()} // Prevent click inside from closing
+                    >
+                        {/* Close button */}
+                        <button
+                            className="absolute top-4 right-4 text-gray-700"
+                            onClick={closePopover}
+                        >
+                            ✕
+                        </button>
+                        <CardDetails product={product} />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default Card;
