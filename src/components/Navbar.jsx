@@ -2,12 +2,20 @@ import React from 'react'
 import Image from 'next/image'
 import logo from "../Image/logo.png"
 import profile from "../Image/profile.avif"
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, HeartIcon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { Bars3Icon, HeartIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-
+import { useSelector } from 'react-redux';
+import Badge, { BadgeProps } from '@mui/material/Badge';
+import { styled } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const Navbar = () => {
+
+    const cartItems = useSelector((state) => state.cart.items);
+    const cartCount = String(cartItems.length)
+
     const navigation = [
         { name: 'About us', href: '/about', current: false },
         { name: 'Contact us', href: '/contact', current: false },
@@ -17,6 +25,16 @@ const Navbar = () => {
     function classNames(...classes) {
         return classes.filter(Boolean).join(' ')
     }
+
+    const StyledBadge = styled(Badge)(({ theme }) => ({
+        '& .MuiBadge-badge': {
+            right: -3,
+            top: 13,
+            border: `1px solid ${theme.palette.background.paper}`,
+            backgroundColor: '#8B4513',
+            padding: '0 1px',
+        },
+    }));
 
     return (
         <>
@@ -49,7 +67,7 @@ const Navbar = () => {
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             <div className="hidden sm:ml-6 sm:block">
                                 <div className="flex">
-                                    
+
                                     {navigation.map((item) => (
                                         <a
                                             key={item.name}
@@ -73,14 +91,13 @@ const Navbar = () => {
                                 <span className="sr-only">Wishlist</span>
                                 <HeartIcon aria-hidden="true" className="h-6 w-6" />
                             </button>
-                            <button
-                                type="button"
-                                className="relative rounded-full p-1 text-gray-900 hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                            >
-                                <span className="absolute -inset-1.5" />
-                                <span className="sr-only">Cart</span>
-                                <ShoppingCartIcon aria-hidden="true" className="h-6 w-6" />
-                            </button>
+                            <Link href={'/cart'}>
+                                <IconButton aria-label="cart">
+                                    <StyledBadge badgeContent={cartCount} color="secondary">
+                                        <ShoppingCartIcon />
+                                    </StyledBadge>
+                                </IconButton>
+                            </Link>
 
                             {/* Profile dropdown */}
                             <Menu as="div" className="relative ml-3">

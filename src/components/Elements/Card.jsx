@@ -9,13 +9,16 @@ import {
 import { HeartIcon } from "@heroicons/react/24/outline";
 import Image from 'next/image';
 import Button from '../UI/Button';
-import { useRouter } from 'next/router';
 import CardDetails from './CardDetails';
+import { useDispatch } from 'react-redux';
+import { addItemToCart } from '../../pages/store/slices/cart';
 
 const Card = ({ product, categoryName }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [isPopoverVisible, setIsPopoverVisible] = useState(false); // State to manage popover visibility
-    const router = useRouter();
+    const [selectedVariant, setSelectedVariant] = useState(null);
+    const [quantity, setQuantity] = useState(1);
+    const dispatch = useDispatch();
 
     const productImage =
         product.oneImg || product.mainImage || (product.images && product.images[0]);
@@ -35,8 +38,26 @@ const Card = ({ product, categoryName }) => {
 
     const randomHashtag = getRandomHashtag(product.keywords);
 
+    // Define the current variant to use in Add to Cart
+    const currentVariant = selectedVariant || formattedVariants[0];
+
+    // Handle Add to Cart directly from the Card
     const handleAddToCart = () => {
-        router.push(`/cardDetail/${product.id}`);
+        if (!currentVariant) {
+            alert('Please select a size');
+            return;
+        }
+
+        const cartItem = {
+            id: product.id,
+            name: productName,
+            offerPrice: currentVariant.offerPrice,
+            image: productImage,
+            size: currentVariant.size,
+            quantity: quantity,
+        };
+
+        dispatch(addItemToCart(cartItem));
     };
 
     const togglePopover = () => {
@@ -48,13 +69,16 @@ const Card = ({ product, categoryName }) => {
     };
 
     return (
-        <div className="relative group"  onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}>
+        <div
+            className="relative group"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
             <CardLayout
                 className="bg-secondary bg-opacity-25 transition-transform duration-300"
-                onClick={togglePopover} // Toggle popover on click
+
             >
-                <CardHeader shadow={false} floated={false} className="relative h-44">
+                <CardHeader shadow={false} floated={false} className="relative h-44" onClick={togglePopover}>
                     <Image
                         src={productImage}
                         alt={productName}
@@ -63,14 +87,17 @@ const Card = ({ product, categoryName }) => {
                         objectFit="cover"
                     />
                 </CardHeader>
-                <CardBody>
+                <CardBody onClick={togglePopover}>
                     <div className="mb-1 flex items-center justify-between">
                         <Typography color="gray" className="font-small text-gray-400">
                             {categoryName}
                         </Typography>
                     </div>
                     <div className="mb-2 flex items-center justify-between">
-                        <Typography color="blue-gray" className="cursor-default font-semibold truncate whitespace-nowrap">
+                        <Typography
+                            color="blue-gray"
+                            className="cursor-default font-semibold truncate whitespace-nowrap"
+                        >
                             {productName}
                         </Typography>
                     </div>
