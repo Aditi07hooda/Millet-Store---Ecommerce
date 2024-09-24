@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useSelector, useDispatch } from 'react-redux';
-import { increaseItemQuantity, decreaseItemQuantity, removeItemFromCart } from '../pages/store/slices/cart';
+import { increaseItemQuantity, decreaseItemQuantity, removeItemFromCart } from '../store/slices/cart';
 import Link from 'next/link';
 import Button from '@/components/UI/Button';
 

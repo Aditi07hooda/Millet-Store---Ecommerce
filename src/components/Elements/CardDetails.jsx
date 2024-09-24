@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import DOMPurify from 'dompurify';
 import Button from '../UI/Button';
 import { useDispatch } from 'react-redux';
-import { addItemToCart, increaseItemQuantity, decreaseItemQuantity } from '../../pages/store/slices/cart';
+import { addItemToCart, increaseItemQuantity, decreaseItemQuantity } from '../../store/slices/cart';
 
 const CardDetails = ({ product }) => {
   const dispatch = useDispatch();

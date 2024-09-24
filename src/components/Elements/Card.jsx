@@ -11,7 +11,7 @@ import Image from 'next/image';
 import Button from '../UI/Button';
 import CardDetails from './CardDetails';
 import { useDispatch } from 'react-redux';
-import { addItemToCart } from '../../pages/store/slices/cart';
+import { addItemToCart } from '../../store/slices/cart';
 
 const Card = ({ product, categoryName }) => {
     const [isHovered, setIsHovered] = useState(false);
