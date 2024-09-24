@@ -15,11 +15,11 @@ const HeaderBottom = () => {
 
     return (
         <div className="py-4 px-8 mx-6 rounded-lg bg-secondary bg-opacity-20">
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {featuredProduct.map((item, index) => (
                     <div
                         key={index}
-                        className="flex flex-col items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:text-primary"
+                        className="flex flex-col flex-wrap items-center transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:text-primary"
                     >
                         <Image
                             className="rounded-full"
@@ -29,7 +29,7 @@ const HeaderBottom = () => {
                             height={100}
                             objectFit="cover"
                         />
-                        <p className="text-sm font-semibold text-center mt-2">{item.name}</p>
+                        <p className="text-sm font-semibold text-center mt-2 flex flex-wrap">{item.name}</p>
                     </div>
                 ))}
             </div>
