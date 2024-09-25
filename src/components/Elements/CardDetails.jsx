@@ -3,22 +3,27 @@ import React, { useState } from 'react';
 import DOMPurify from 'dompurify';
 import Button from '../UI/Button';
 import { useDispatch } from 'react-redux';
-import { addItemToCart, increaseItemQuantity, decreaseItemQuantity } from '../../store/slices/cart';
+import { addItemToCartAsync, removeItemFromCartAsync } from '../../store/slices/cart';
 
 const CardDetails = ({ product }) => {
   const dispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState();
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   const productImage =
     product.oneImg || product.mainImage || (product.images && product.images[0]);
   const productName = product.name || 'No Name Available';
   const productDescription = product.description || 'No Description Available';
   const availableVariants = product.variants || [];
+  const availableProductSize = product.variantMatrix.Size || [];
+
   const formattedVariants = availableVariants.map((variant) => ({
-    size: variant.name,
+    id: variant.id,
+    name: variant.name,
     price: variant.price,
     offerPrice: variant.offerPrice,
+    sizes: availableProductSize.filter(size => size.variantId === variant.id),
   }));
 
   const calculateSavedPercentage = (price, offerPrice) => {
@@ -27,20 +32,23 @@ const CardDetails = ({ product }) => {
   };
 
   const handleIncreaseQuantity = (item) => {
-    dispatch(increaseItemQuantity({ id: item.id, size: item.size }));
-};
-
-const handleDecreaseQuantity = (item) => {
-    if (item.quantity > 1) {
-        dispatch(decreaseItemQuantity({ id: item.id, size: item.size }));
+    if (selectedSize) {
+      dispatch(addItemToCartAsync({ id: item.id, size: selectedSize }));
+    } else {
+      alert('Please select a size');
     }
-};
+  };
+
+  const handleDecreaseQuantity = (item) => {
+    if (item.quantity > 1 && selectedSize) {
+      dispatch(removeItemFromCartAsync({ id: item.id, size: selectedSize }));
+    }
+  };
 
   const sanitizedDescription = DOMPurify.sanitize(productDescription);
 
-  // Handle size selection and update the selected variant
-  const handleSizeSelection = (variant) => {
-    setSelectedVariant(variant);
+  const handleSizeSelection = (size) => {
+    setSelectedSize(size);
   };
 
   // The displayed price and saved percentage based on the selected variant
@@ -52,21 +60,20 @@ const handleDecreaseQuantity = (item) => {
 
   // Handle Add to Cart
   const handleAddToCart = () => {
-    if (!currentVariant) {
-      alert('Please select a size');
+    if (!selectedSize) {
+      alert('Please select a variant and size');
       return;
     }
 
     const cartItem = {
-      id: product.id,
-      name: productName,
+      id: currentVariant.id,
+      name: currentVariant.name,
       offerPrice: currentVariant.offerPrice,
       image: productImage,
-      size: currentVariant.size,
+      size: selectedSize,
       quantity: quantity,
     };
-
-    dispatch(addItemToCart(cartItem));
+    dispatch(addItemToCartAsync(cartItem));
   };
 
   return (
@@ -109,19 +116,18 @@ const handleDecreaseQuantity = (item) => {
           />
         </div>
 
-        {/* Size Selection */}
+        {/* Variant and Size Selection */}
         <div className="mb-4">
-          <span className="text-gray-700 font-semibold">Size:</span>
+          <span className="text-gray-700 font-semibold">Sizes:</span>
           <div className="flex space-x-2 mt-2">
             {formattedVariants.map((variant) => (
               <button
-                key={variant.size}
-                className={`border px-3 py-1 rounded ${
-                  selectedVariant === variant ? 'bg-secondary' : 'hover:bg-gray-100'
-                }`}
+                key={variant.id}
+                className={`border px-3 py-1 rounded ${selectedVariant === variant ? 'bg-secondary' : 'hover:bg-gray-100'
+                  }`}
                 onClick={() => handleSizeSelection(variant)}
               >
-                {variant.size}
+                {variant.name}
               </button>
             ))}
           </div>
@@ -131,14 +137,14 @@ const handleDecreaseQuantity = (item) => {
         <div className="flex items-center space-x-4">
           <div className="flex items-center border rounded">
             <button
-              onClick={decreaseItemQuantity}
+              onClick={handleDecreaseQuantity}
               className="px-2 py-1 border-r hover:bg-gray-100"
             >
               -
             </button>
             <span className="px-3">{quantity}</span>
             <button
-              onClick={increaseItemQuantity}
+              onClick={handleIncreaseQuantity}
               className="px-2 py-1 border-l hover:bg-gray-100"
             >
               +

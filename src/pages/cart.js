@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { useSelector, useDispatch } from 'react-redux';
-import { increaseItemQuantity, decreaseItemQuantity, removeItemFromCart } from '../store/slices/cart';
+import { fetchCartItemsAsync, addItemToCartAsync, removeItemFromCartAsync } from '../store/slices/cart';
 import Link from 'next/link';
 import Button from '@/components/UI/Button';
 
@@ -13,18 +13,23 @@ const Cart = () => {
     const shipping = 7.0;
     const totalPrice = totalAmount + shipping;
 
+    useEffect(() => {
+        dispatch(fetchCartItemsAsync());
+    }, [dispatch]);
+
     const handleIncreaseQuantity = (item) => {
-        dispatch(increaseItemQuantity({ id: item.id, size: item.size }));
+        console.log(item)
+        dispatch(addItemToCartAsync({ id: item.id, size: item.size }));
     };
 
     const handleDecreaseQuantity = (item) => {
         if (item.quantity > 1) {
-            dispatch(decreaseItemQuantity({ id: item.id, size: item.size }));
+            dispatch(removeItemFromCartAsync({ id: item.id, size: item.size }));
         }
     };
 
     const handleRemoveItem = (item) => {
-        dispatch(removeItemFromCart({ id: item.id, size: item.size }));
+        dispatch(removeItemFromCartAsync({ id: item.id, size: item.size }));
     };
 
     return (
@@ -58,7 +63,7 @@ const Cart = () => {
                             {/* Price and Quantity */}
                             <div className="flex items-center">
                                 <span className="text-gray-800 mr-6">
-                                    Rs. {item.offerPrice.toFixed(2)}
+                                    Rs. {item.offerPrice}
                                 </span>
                                 <div className="flex items-center border rounded">
                                     <button
@@ -109,7 +114,6 @@ const Cart = () => {
                         className="w-full border rounded p-2 mb-4 focus:outline-none"
                     />
                     <Button text={'Apply'}>
-
                     </Button>
                 </div>
                 <div className="border p-4 rounded mb-4">
@@ -134,7 +138,6 @@ const Cart = () => {
                     </ul>
                 </div>
                 <Button text={'Proceed To Checkout'}>
-
                 </Button>
             </div>
         </div>

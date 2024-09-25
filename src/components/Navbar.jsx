@@ -41,16 +41,7 @@ const Navbar = () => {
             <Disclosure as="nav" className="bg-secondary sticky top-0 z-10">
                 <div className="mx-auto px-2 sm:px-6 lg:px-8">
                     <div className="relative flex h-16 items-center justify-between">
-                        <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                            {/* Mobile menu button*/}
-                            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-primary-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                                <span className="absolute -inset-0.5" />
-                                <span className="sr-only">Open main menu</span>
-                                <Bars3Icon aria-hidden="true" className="block h-6 w-6 group-data-[open]:hidden" />
-                                <XMarkIcon aria-hidden="true" className="hidden h-6 w-6 group-data-[open]:block" />
-                            </DisclosureButton>
-                        </div>
-                        <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                        <div className="flex flex-1 items-center justify-start sm:items-stretch sm:justify-start">
                             <Link href="/">
                                 <div className="flex flex-shrink-0 items-center">
                                     <Image
@@ -58,11 +49,20 @@ const Navbar = () => {
                                         src={logo}
                                         className="h-10 w-auto cursor-default"
                                     />
-                                    <p className='block px-4 py-2 text-lg text-black font-semibold cursor-default'>
+                                    <p className='px-4 py-2 text-lg text-black font-semibold cursor-default hidden sm:block'>
                                         The Millet Store
                                     </p>
                                 </div>
                             </Link>
+                        </div>
+                        <div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
+                            {/* Mobile menu button*/}
+                            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-primary-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                                <span className="absolute -inset-0.5" />
+                                <span className="sr-only">Open main menu</span>
+                                <Bars3Icon aria-hidden="true" className="block h-6 w-6 group-data-[open]:hidden" />
+                                <XMarkIcon aria-hidden="true" className="hidden h-6 w-6 group-data-[open]:block" />
+                            </DisclosureButton>
                         </div>
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                             <div className="hidden sm:ml-6 sm:block">
@@ -85,13 +85,14 @@ const Navbar = () => {
                             </div>
                             <button
                                 type="button"
-                                className="relative rounded-full p-1 text-gray-900 hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                                className="relative rounded-full p-1 text-gray-900 hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 hidden sm:block"
                             >
                                 <span className="absolute -inset-1.5" />
                                 <span className="sr-only">Wishlist</span>
                                 <HeartIcon aria-hidden="true" className="h-6 w-6" />
                             </button>
-                            <Link href={'/cart'}>
+
+                            <Link href={'/cart'} className="hidden sm:block">
                                 <IconButton aria-label="cart">
                                     <StyledBadge badgeContent={cartCount} color="secondary">
                                         <ShoppingCartIcon />
@@ -99,8 +100,9 @@ const Navbar = () => {
                                 </IconButton>
                             </Link>
 
+
                             {/* Profile dropdown */}
-                            <Menu as="div" className="relative ml-3">
+                            <Menu as="div" className="relative ml-3 hidden sm:block">
                                 <div>
                                     <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                         <span className="absolute -inset-1.5" />
