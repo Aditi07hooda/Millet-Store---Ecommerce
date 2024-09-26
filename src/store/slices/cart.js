@@ -11,15 +11,32 @@ const initialState = {
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
+let sessionId;
+if (typeof window !== 'undefined') {
+    sessionId = localStorage.getItem('sessionId');
+}
+
 // Async thunk for fetching cart items
 export const fetchCartItemsAsync = createAsyncThunk(
     'cart/fetchCartItems',
     async () => {
-        const response = await fetch(`${base_url}/store/${brand_id}/cart`);
+        const response = await fetch(`${base_url}/store/${brand_id}/cart`, {
+            headers: {
+                'session': sessionId,
+            },
+        });
         if (!response.ok) throw new Error('Failed to fetch cart items');
         const data = await response.json();
-        console.log(data); // Log the data for inspection
-        return data.items || []; // Adjust based on actual response structure
+        const cartItemsWithImages = data.items.map(item => {
+            const storedImage = localStorage.getItem(`image_${item.variantId}`);
+
+            return {
+                ...item,
+                image: storedImage,  
+            };
+        });
+        console.log(data);
+        return cartItemsWithImages || [];
     }
 );
 
@@ -31,31 +48,36 @@ export const addItemToCartAsync = createAsyncThunk(
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'session': sessionId,
             },
-            body: JSON.stringify({ size: item.size }),
+            body: JSON.stringify(item),
         });
 
         if (!response.ok) throw new Error('Failed to add item to cart');
         const data = await response.json();
-        return data;
+        return {
+            ...data,
+            variantImage: item.image,
+        };
     }
 );
 
 // Async thunk for removing an item from the cart
 export const removeItemFromCartAsync = createAsyncThunk(
     'cart/removeItemFromCart',
-    async ({ id, size }) => {
-        const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${id}`, {
-            method: 'POST',
+    async (item) => {
+        const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.id}`, {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
+                'session': sessionId,
             },
             body: JSON.stringify({ size }),
         });
 
         if (!response.ok) throw new Error('Failed to remove item from cart');
         const data = await response.json();
-        return { id, size, data };
+        return data;
     }
 );
 

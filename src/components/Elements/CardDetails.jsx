@@ -3,27 +3,32 @@ import React, { useState } from 'react';
 import DOMPurify from 'dompurify';
 import Button from '../UI/Button';
 import { useDispatch } from 'react-redux';
-import { addItemToCartAsync, removeItemFromCartAsync } from '../../store/slices/cart';
+import { addItemToCartAsync } from '../../store/slices/cart';
 
 const CardDetails = ({ product }) => {
   const dispatch = useDispatch();
-  const [quantity, setQuantity] = useState(1);
-  const [selectedVariant, setSelectedVariant] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
+
+  const [state, setState] = useState({
+    isHovered: false,
+    isPopoverVisible: false,
+    selectedVariant: null,
+    selectedSize: null,
+  })
 
   const productImage =
     product.oneImg || product.mainImage || (product.images && product.images[0]);
   const productName = product.name || 'No Name Available';
   const productDescription = product.description || 'No Description Available';
   const availableVariants = product.variants || [];
-  const availableProductSize = product.variantMatrix.Size || [];
+  const availableProductSize = Object.values(product.variantMatrix.Size) || [];
 
   const formattedVariants = availableVariants.map((variant) => ({
     id: variant.id,
-    name: variant.name,
+    name: productName,
     price: variant.price,
     offerPrice: variant.offerPrice,
-    sizes: availableProductSize.filter(size => size.variantId === variant.id),
+    image: productImage,
+    size: availableProductSize,
   }));
 
   const calculateSavedPercentage = (price, offerPrice) => {
@@ -31,28 +36,19 @@ const CardDetails = ({ product }) => {
     return Math.round(((price - offerPrice) / price) * 100);
   };
 
-  const handleIncreaseQuantity = (item) => {
-    if (selectedSize) {
-      dispatch(addItemToCartAsync({ id: item.id, size: selectedSize }));
-    } else {
-      alert('Please select a size');
-    }
-  };
-
-  const handleDecreaseQuantity = (item) => {
-    if (item.quantity > 1 && selectedSize) {
-      dispatch(removeItemFromCartAsync({ id: item.id, size: selectedSize }));
-    }
-  };
-
   const sanitizedDescription = DOMPurify.sanitize(productDescription);
 
   const handleSizeSelection = (size) => {
-    setSelectedSize(size);
+    setState((prev) => {
+      return {
+        ...prev,
+        selectedSize: size,
+      };
+    })
   };
 
   // The displayed price and saved percentage based on the selected variant
-  const currentVariant = selectedVariant || formattedVariants[0];
+  const currentVariant = state.selectedVariant || formattedVariants[0];
   const savedPercentage = calculateSavedPercentage(
     currentVariant.price,
     currentVariant.offerPrice
@@ -60,7 +56,7 @@ const CardDetails = ({ product }) => {
 
   // Handle Add to Cart
   const handleAddToCart = () => {
-    if (!selectedSize) {
+    if (!state.selectedSize) {
       alert('Please select a variant and size');
       return;
     }
@@ -70,9 +66,9 @@ const CardDetails = ({ product }) => {
       name: currentVariant.name,
       offerPrice: currentVariant.offerPrice,
       image: productImage,
-      size: selectedSize,
-      quantity: quantity,
+      size: state.selectedSize,
     };
+    localStorage.setItem(`image_${cartItem.id}`, cartItem.image)
     dispatch(addItemToCartAsync(cartItem));
   };
 
@@ -120,36 +116,21 @@ const CardDetails = ({ product }) => {
         <div className="mb-4">
           <span className="text-gray-700 font-semibold">Sizes:</span>
           <div className="flex space-x-2 mt-2">
-            {formattedVariants.map((variant) => (
+            {availableProductSize.map((size, index) => (
               <button
-                key={variant.id}
-                className={`border px-3 py-1 rounded ${selectedVariant === variant ? 'bg-secondary' : 'hover:bg-gray-100'
+                key={index}
+                className={`border px-3 py-1 rounded ${state.selectedVariant === size ? 'bg-secondary' : 'hover:bg-gray-100'
                   }`}
-                onClick={() => handleSizeSelection(variant)}
+                onClick={() => handleSizeSelection(size)}
               >
-                {variant.name}
+                {size}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Quantity and Actions */}
+        {/* Actions */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center border rounded">
-            <button
-              onClick={handleDecreaseQuantity}
-              className="px-2 py-1 border-r hover:bg-gray-100"
-            >
-              -
-            </button>
-            <span className="px-3">{quantity}</span>
-            <button
-              onClick={handleIncreaseQuantity}
-              className="px-2 py-1 border-l hover:bg-gray-100"
-            >
-              +
-            </button>
-          </div>
           <Button onClick={handleAddToCart} text={'Add To Cart'} />
           <Button text={'Buy Now'} />
         </div>

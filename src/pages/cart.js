@@ -4,10 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchCartItemsAsync, addItemToCartAsync, removeItemFromCartAsync } from '../store/slices/cart';
 import Link from 'next/link';
 import Button from '@/components/UI/Button';
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const Cart = () => {
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
+    console.log(cartItems)
     const totalQuantity = useSelector((state) => state.cart.totalQuantity);
     const totalAmount = useSelector((state) => state.cart.totalAmount);
     const shipping = 7.0;
@@ -19,12 +21,12 @@ const Cart = () => {
 
     const handleIncreaseQuantity = (item) => {
         console.log(item)
-        dispatch(addItemToCartAsync({ id: item.id, size: item.size }));
+        dispatch(addItemToCartAsync({ id: item.variantId, size: item.variantName }));
     };
 
     const handleDecreaseQuantity = (item) => {
         if (item.quantity > 1) {
-            dispatch(removeItemFromCartAsync({ id: item.id, size: item.size }));
+            dispatch(removeItemFromCartAsync({ id: item.variantId, size: item.variantName }));
         }
     };
 
@@ -43,58 +45,57 @@ const Cart = () => {
                     cartItems.map((item) => (
                         <div
                             key={`${item.id}-${item.size}`}
-                            className="flex items-center justify-between p-4 border rounded mb-4"
+                            className="flex px-4 py-3 border rounded mb-4 flex-col"
                         >
                             {/* Product Image and Details */}
-                            <div className="flex items-center">
+                            <div className="flex items-center justify-between">
                                 <Image
                                     src={item.image}
                                     alt={item.name}
                                     className="w-20 h-20 object-cover rounded mr-4"
                                     width={80}
                                     height={80}
-                                />
+                                    />
                                 <div>
                                     <h3 className="font-semibold text-gray-800">{item.name}</h3>
-                                    <p className="text-gray-600 text-sm">Size: {item.size}</p>
+                                    <p className="text-gray-600 text-sm">Size: {item.variantName}</p>
+                                    {/* Price and Quantity */}
+                                    <div className="flex flex-col">
+                                        <span className="text-gray-800 mr-6 font-bold">
+                                            Rs. {(item.price * item.qty).toFixed(2)}
+                                        </span>
+                                        <div className='flex'>
+                                            <div className="flex items-center border rounded">
+                                                <button
+                                                    onClick={() => handleDecreaseQuantity(item)}
+                                                    className="px-2 py-1 border-r hover:bg-gray-100"
+                                                >
+                                                    -
+                                                </button>
+                                                <input
+                                                    type="text"
+                                                    value={item.qty}
+                                                    readOnly
+                                                    className="w-10 text-center border-none focus:outline-none"
+                                                />
+                                                <button
+                                                    onClick={() => handleIncreaseQuantity(item)}
+                                                    className="px-2 py-1 border-l hover:bg-gray-100"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <button
+                                                className="text-red-500 ml-4"
+                                                onClick={() => handleRemoveItem(item)}
+                                            >
+                                                <RiDeleteBinLine />
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Price and Quantity */}
-                            <div className="flex items-center">
-                                <span className="text-gray-800 mr-6">
-                                    Rs. {item.offerPrice}
-                                </span>
-                                <div className="flex items-center border rounded">
-                                    <button
-                                        onClick={() => handleDecreaseQuantity(item)}
-                                        className="px-2 py-1 border-r hover:bg-gray-100"
-                                    >
-                                        -
-                                    </button>
-                                    <input
-                                        type="text"
-                                        value={item.quantity}
-                                        readOnly
-                                        className="w-10 text-center border-none focus:outline-none"
-                                    />
-                                    <button
-                                        onClick={() => handleIncreaseQuantity(item)}
-                                        className="px-2 py-1 border-l hover:bg-gray-100"
-                                    >
-                                        +
-                                    </button>
-                                </div>
-                                <span className="text-gray-800 ml-6">
-                                    Rs. {(item.offerPrice * item.quantity).toFixed(2)}
-                                </span>
-                                <button
-                                    className="text-red-500 ml-4"
-                                    onClick={() => handleRemoveItem(item)}
-                                >
-                                    ×
-                                </button>
-                            </div>
                         </div>
                     ))
                 )}
