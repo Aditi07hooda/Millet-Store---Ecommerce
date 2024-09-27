@@ -32,7 +32,7 @@ export const fetchCartItemsAsync = createAsyncThunk(
 
             return {
                 ...item,
-                image: storedImage,  
+                image: storedImage,
             };
         });
         console.log(data);
@@ -66,13 +66,11 @@ export const addItemToCartAsync = createAsyncThunk(
 export const removeItemFromCartAsync = createAsyncThunk(
     'cart/removeItemFromCart',
     async (item) => {
-        const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.id}`, {
+        const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.variantId}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json',
                 'session': sessionId,
             },
-            body: JSON.stringify({ size }),
         });
 
         if (!response.ok) throw new Error('Failed to remove item from cart');
@@ -100,38 +98,51 @@ const cartSlice = createSlice({
                     return;
                 }
                 state.items = action.payload;
-                state.totalQuantity = action.payload.reduce((sum, item) => sum + item.quantity, 0);
-                state.totalAmount = action.payload.reduce((sum, item) => sum + item.offerPrice * item.quantity, 0);
+                state.totalQuantity = action.payload.reduce((sum, item) => sum + item.qty, 0);
+                state.totalAmount = action.payload.reduce((sum, item) => sum + item.price * item.qty, 0);
             })
 
             // Add Item to Cart or Increase Quantity Reducer
             .addCase(addItemToCartAsync.fulfilled, (state, action) => {
                 const newItem = action.payload;
                 const existingItem = state.items.find(item => item.id === newItem.id && item.size === newItem.size);
+                console.log(existingItem)
 
                 if (!existingItem) {
-                    state.items.push({ ...newItem, quantity: 1 });
+                    state.items.push({ ...newItem, qty: 1 });
                     state.totalQuantity++;
-                    state.totalAmount += newItem.offerPrice;
+                    state.totalAmount += newItem.price;
                 } else {
-                    existingItem.quantity++;
-                    state.totalAmount += existingItem.offerPrice;
+                    existingItem.qty++;
+                    state.totalAmount += existingItem.price;
                 }
             })
 
             // Remove Item from Cart or Decrease Quantity Reducer
             .addCase(removeItemFromCartAsync.fulfilled, (state, action) => {
-                const { id, size } = action.payload;
-                const existingItem = state.items.find(item => item.id === id && item.size === size);
+                const items = action.payload.items;
+
+                if (!items || items.length === 0) {
+                    console.log("All items removed from the cart.");
+                    state.items = [];
+                    state.totalQuantity = 0;
+                    state.totalAmount = 0;
+                    return;
+                }
+
+                const itemDelete = items[0];
+                const existingItem = state.items.find(item => item.id === itemDelete.id);
 
                 if (existingItem) {
-                    state.totalAmount -= existingItem.offerPrice;
                     state.totalQuantity--;
-                    if (existingItem.quantity === 1) {
-                        state.items = state.items.filter(item => !(item.id === id && item.size === size));
+                    if (existingItem.qty === 1) {
+                        state.items = state.items.filter(item => item.id !== itemDelete.id);
                     } else {
-                        existingItem.quantity--;
+                        existingItem.qty--;
                     }
+                    state.totalAmount = state.items.reduce((acc, item) => acc + item.price * item.qty, 0);
+                } else {
+                    console.error("Item not found in the cart.");
                 }
             })
 

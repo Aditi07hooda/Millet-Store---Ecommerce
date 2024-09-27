@@ -17,7 +17,6 @@ const Product = () => {
                     throw new Error(`Error: ${response.status} ${response.statusText}`);
                 }
                 const data = await response.json();
-                console.log('Successful fetch:', data);
                 setProducts(data);
             } catch (error) {
                 console.error('Error fetching products:', error);

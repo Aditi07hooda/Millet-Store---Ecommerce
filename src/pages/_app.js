@@ -25,7 +25,7 @@ export default function App({ Component, pageProps }) {
       }
 
       const data = await response.json();
-      console.log("Session Data:", data);
+      // console.log("Session Data:", data);
 
       setSessionId(data.session);
       localStorage.setItem("sessionId", data.session);

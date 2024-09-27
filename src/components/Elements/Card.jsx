@@ -23,7 +23,6 @@ const Card = ({ product, categoryName }) => {
     const productImage =
         product.oneImg || product.mainImage || (product.images && product.images[0]);
     const productName = product.name || 'No Name Available';
-    console.log(productName)
     const availableVariants = product.variants || [];
     const formattedVariants = availableVariants.map(variant => ({
         size: variant.name,
@@ -41,7 +40,6 @@ const Card = ({ product, categoryName }) => {
 
     // Define the current variant to use in Add to Cart
     const currentVariant = selectedVariant || formattedVariants[0];
-    console.log(currentVariant)
 
     // Handle Add to Cart directly from the Card
     const handleAddToCart = () => {

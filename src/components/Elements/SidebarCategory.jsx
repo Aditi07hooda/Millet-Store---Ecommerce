@@ -8,19 +8,8 @@ import { Disclosure } from "@headlessui/react";
 export default function SidebarCategory() {
   return (
     <Disclosure as="nav" className="relative">
-      {({ open }) => (
+      {() => (
         <>
-          {/* Mobile menu button positioned under the carousel */}
-          <div className="flex items-center sm:hidden justify-start">
-            <Disclosure.Button className="inline-flex items-center justify-center p-2 text-gray-800 hover:bg-primary-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-              {open ? (
-                <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-              ) : (
-                <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-              )}
-            </Disclosure.Button>
-          </div>
-
           {/* Sidebar content for large screens */}
           <Card className="hidden sm:block w-full max-w-[20rem] shadow-xl shadow-blue-gray-900/5 h-[calc(100vh-6rem)]">
             <div className="bg-primary p-4 flex justify-between">
@@ -31,9 +20,6 @@ export default function SidebarCategory() {
               >
                 Categories
               </Typography>
-              {open && (
-                <XMarkIcon className="h-6 w-6 cursor-pointer" aria-hidden="true" />
-              )}
             </div>
             <div className="h-[calc(100vh-10rem)] overflow-y-auto">
               <List className="bg-secondary bg-opacity-15">

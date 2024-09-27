@@ -9,7 +9,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 const Cart = () => {
     const dispatch = useDispatch();
     const cartItems = useSelector((state) => state.cart.items);
-    console.log(cartItems)
+    // console.log(cartItems)
     const totalQuantity = useSelector((state) => state.cart.totalQuantity);
     const totalAmount = useSelector((state) => state.cart.totalAmount);
     const shipping = 7.0;
@@ -20,13 +20,14 @@ const Cart = () => {
     }, [dispatch]);
 
     const handleIncreaseQuantity = (item) => {
-        console.log(item)
+        // console.log(item)
         dispatch(addItemToCartAsync({ id: item.variantId, size: item.variantName }));
     };
 
     const handleDecreaseQuantity = (item) => {
-        if (item.quantity > 1) {
-            dispatch(removeItemFromCartAsync({ id: item.variantId, size: item.variantName }));
+        // console.log(item)
+        if (item.qty > 0) {
+            dispatch(removeItemFromCartAsync(item));
         }
     };
 

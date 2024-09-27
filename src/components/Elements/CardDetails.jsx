@@ -20,7 +20,8 @@ const CardDetails = ({ product }) => {
   const productName = product.name || 'No Name Available';
   const productDescription = product.description || 'No Description Available';
   const availableVariants = product.variants || [];
-  const availableProductSize = Object.values(product.variantMatrix.Size) || [];
+  const variantType = product.variantTypes[0];
+  const availableProductSize = Object.values(product.variantMatrix[variantType]) || [];
 
   const formattedVariants = availableVariants.map((variant) => ({
     id: variant.id,
@@ -28,8 +29,10 @@ const CardDetails = ({ product }) => {
     price: variant.price,
     offerPrice: variant.offerPrice,
     image: productImage,
-    size: availableProductSize,
+    size: variant.name,
   }));
+
+  console.log(formattedVariants)
 
   const calculateSavedPercentage = (price, offerPrice) => {
     if (!price || !offerPrice) return 0;
@@ -43,12 +46,15 @@ const CardDetails = ({ product }) => {
       return {
         ...prev,
         selectedSize: size,
+        selectedVariant: formattedVariants.find((variant) => variant.size === size),
       };
     })
   };
 
   // The displayed price and saved percentage based on the selected variant
+  console.log(state.selectedVariant)
   const currentVariant = state.selectedVariant || formattedVariants[0];
+  console.log(currentVariant)
   const savedPercentage = calculateSavedPercentage(
     currentVariant.price,
     currentVariant.offerPrice
@@ -119,7 +125,7 @@ const CardDetails = ({ product }) => {
             {availableProductSize.map((size, index) => (
               <button
                 key={index}
-                className={`border px-3 py-1 rounded ${state.selectedVariant === size ? 'bg-secondary' : 'hover:bg-gray-100'
+                className={`border px-3 py-1 rounded ${state.selectedSize === size ? 'bg-secondary' : 'hover:bg-gray-100'
                   }`}
                 onClick={() => handleSizeSelection(size)}
               >
