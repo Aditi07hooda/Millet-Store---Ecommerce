@@ -3,7 +3,9 @@ import "@/styles/globals.css";
 import store from "../store/store";
 import { Provider } from 'react-redux';
 import { useEffect, useState } from "react";
+import Loader from "@/components/UI/Loader";
 import MobileBottomNavbar from "@/components/UI/MobileBottomNavbar";
+import Footer from "@/components/Footer";
 
 export default function App({ Component, pageProps }) {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -44,10 +46,11 @@ export default function App({ Component, pageProps }) {
         <Provider store={store}>
           <Navbar />
           <Component {...pageProps} />
+          <Footer />
           <MobileBottomNavbar />
         </Provider>
       ) : (
-        <p>Loading...</p>
+        <Loader />
       )}
     </>
   );

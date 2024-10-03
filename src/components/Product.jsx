@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Card from './Elements/Card';
+import Loader from './UI/Loader';
 
 const Product = () => {
     const [products, setProducts] = useState([]);
@@ -28,7 +29,7 @@ const Product = () => {
         getProducts();
     }, [base_url, brand_id]);
 
-    if (loading) return <p>Loading products...</p>;
+    if (loading) return <Loader/>;
     if (error) return <p>Error loading products: {error}</p>;
 
     // Group products by category
