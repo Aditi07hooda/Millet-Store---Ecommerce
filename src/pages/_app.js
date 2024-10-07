@@ -11,7 +11,8 @@ export default function App({ Component, pageProps }) {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
-  const [sessionId, setSessionId] = useState("");
+  const [sessionId, setSessionId] = "";
+  const [loading, setLoading] = useState(true);
 
   const fetchSession = async () => {
     try {
@@ -27,31 +28,32 @@ export default function App({ Component, pageProps }) {
       }
 
       const data = await response.json();
-      // console.log("Session Data:", data);
-
       setSessionId(data.session);
       localStorage.setItem("sessionId", data.session);
     } catch (error) {
       console.error("Error fetching session:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSession();
+    const userData = localStorage.getItem('userData');
+    if (!userData) {
+      fetchSession();
+    } else {
+      setLoading(false); 
+    }
   }, []);
 
+  if (loading) return <Loader />;
+
   return (
-    <>
-      {sessionId ? (
-        <Provider store={store}>
-          <Navbar />
-          <Component {...pageProps} />
-          <Footer />
-          <MobileBottomNavbar />
-        </Provider>
-      ) : (
-        <Loader />
-      )}
-    </>
+    <Provider store={store}>
+      <Navbar />
+      <Component {...pageProps} />
+      <Footer />
+      <MobileBottomNavbar />
+    </Provider>
   );
 }

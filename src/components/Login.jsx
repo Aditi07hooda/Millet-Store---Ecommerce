@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import Button from './UI/Button';
+import { useRouter } from 'next/router';
 
 const Login = () => {
+    const router = useRouter();
     const [state, setState] = useState({
         contactNumber: '',
         isValid: false,
@@ -85,8 +87,11 @@ const Login = () => {
                 validationInput: false,
                 contactNumber: '',
             }));
-
+            console.log(state)
             localStorage.setItem("sessionId", data.session);
+            router.push('/user');
+            // if (state.isValid) {
+            // }
         } catch (error) {
             console.error('Error validating OTP', error);
             setState((prevState) => ({
@@ -112,6 +117,8 @@ const Login = () => {
             sendOtp(state.contactNumber);
         } else {
             validateOtp(state.otp);
+            console.log(state.isValid);
+            
         }
     };
 
