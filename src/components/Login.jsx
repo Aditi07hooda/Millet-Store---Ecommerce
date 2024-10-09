@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from './UI/Button';
 import { useRouter } from 'next/router';
+import { getSessionId, setSessionId } from '@/store/LocalStorage';
 
 const Login = () => {
     const router = useRouter();
@@ -64,6 +65,7 @@ const Login = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization' : `Bearer ${getSessionId()}`,
                     'Accept': 'application/json',
                 },
                 body: new URLSearchParams({
@@ -88,7 +90,7 @@ const Login = () => {
                 contactNumber: '',
             }));
             console.log(state)
-            localStorage.setItem("sessionId", data.session);
+            setSessionId(data.session);
             router.push('/user');
             // if (state.isValid) {
             // }
@@ -117,8 +119,7 @@ const Login = () => {
             sendOtp(state.contactNumber);
         } else {
             validateOtp(state.otp);
-            console.log(state.isValid);
-            
+            console.log(state.isValid);           
         }
     };
 

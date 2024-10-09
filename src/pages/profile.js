@@ -1,10 +1,11 @@
 import Login from '@/components/Login'
 import Button from '@/components/UI/Button';
 import User from '@/components/User'
+import { getUserData } from '@/store/LocalStorage';
 import React from 'react'
 
 const profile = () => {
-  const userPresent = localStorage.getItem('userData') ? true : false;
+  const userPresent = getUserData() ? true : false;
   const logoutHandler = () => {
     localStorage.clear();
     window.location.reload();

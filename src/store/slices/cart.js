@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getSessionId } from '../LocalStorage';
 
 const initialState = {
     items: [],
@@ -11,20 +12,19 @@ const initialState = {
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
-let sessionId;
-if (typeof window !== 'undefined') {
-    sessionId = localStorage.getItem('sessionId');
-}
-
 // Async thunk for fetching cart items
 export const fetchCartItemsAsync = createAsyncThunk(
     'cart/fetchCartItems',
     async () => {
+        const sessionId = getSessionId();
         const response = await fetch(`${base_url}/store/${brand_id}/cart`, {
             headers: {
+                'Content-Type': 'application/json',
+                'Authorization' : `Bearer ${sessionId}`,
                 'session': sessionId,
             },
         });
+        console.log(sessionId)
         if (!response.ok) throw new Error('Failed to fetch cart items');
         const data = await response.json();
         const cartItemsWithImages = data.items.map(item => {
@@ -36,6 +36,7 @@ export const fetchCartItemsAsync = createAsyncThunk(
             };
         });
         console.log(data);
+        console.log(cartItemsWithImages);
         return cartItemsWithImages || [];
     }
 );
@@ -44,17 +45,25 @@ export const fetchCartItemsAsync = createAsyncThunk(
 export const addItemToCartAsync = createAsyncThunk(
     'cart/addItemToCart',
     async (item) => {
+        const sessionId = getSessionId();
         const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization' : `Bearer ${sessionId}`,
                 'session': sessionId,
             },
             body: JSON.stringify(item),
         });
 
-        if (!response.ok) throw new Error('Failed to add item to cart');
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error("Unauthorized. Please log in again.");
+            }
+            throw new Error('Failed to add item to cart');
+        }
         const data = await response.json();
+        console.log(data);
         return {
             ...data,
             variantImage: item.image,
@@ -66,6 +75,7 @@ export const addItemToCartAsync = createAsyncThunk(
 export const removeItemFromCartAsync = createAsyncThunk(
     'cart/removeItemFromCart',
     async (item) => {
+        const sessionId = getSessionId();
         const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.variantId}`, {
             method: 'DELETE',
             headers: {

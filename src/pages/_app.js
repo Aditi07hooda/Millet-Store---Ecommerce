@@ -6,19 +6,20 @@ import {useEffect, useState} from "react";
 import Loader from "@/components/UI/Loader";
 import MobileBottomNavbar from "@/components/UI/MobileBottomNavbar";
 import Footer from "@/components/Footer";
+import { getSessionId, getUserData, setSessionId } from "@/store/LocalStorage";
 
 export default function App({Component, pageProps}) {
     const base_url = process.env.NEXT_PUBLIC_BASE_URL;
     const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
-    const [sessionId, setSessionId] = useState(localStorage.getItem("sessionId") || "");
     const [loading, setLoading] = useState(true);
+    const session = getSessionId();
 
     const fetchSession = async () => {
         setLoading(true);
 
         try {
-            if (!sessionId) {
+            if (!session) {
                 const response = await fetch(`${base_url}/store/${brand_id}/init`, {
                     method: 'POST',
                     headers: {
@@ -29,7 +30,6 @@ export default function App({Component, pageProps}) {
                 if (response.ok) {
                     const data = await response.json();
                     setSessionId(data.session);
-                    localStorage.setItem("sessionId", data.session);
                 }
             }
         } catch (error) {
@@ -39,8 +39,9 @@ export default function App({Component, pageProps}) {
         }
     };
 
-    useEffect(async () => {
-        await fetchSession();
+    useEffect(() => {
+        const userData = getUserData()
+        fetchSession();
     }, []);
 
     if (loading) return <Loader/>;

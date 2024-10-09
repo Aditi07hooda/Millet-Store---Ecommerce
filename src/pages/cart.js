@@ -17,7 +17,7 @@ const Cart = () => {
 
     useEffect(() => {
         dispatch(fetchCartItemsAsync());
-    }, [dispatch]);
+    }, []);
 
     const handleIncreaseQuantity = (item) => {
         // console.log(item)
@@ -51,7 +51,7 @@ const Cart = () => {
                             {/* Product Image and Details */}
                             <div className="flex items-center justify-between">
                                 <Image
-                                    src={item.image}
+                                    src={item.image || ''}
                                     alt={item.name}
                                     className="w-20 h-20 object-cover rounded mr-4"
                                     width={80}
