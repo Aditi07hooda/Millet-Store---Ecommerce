@@ -50,6 +50,7 @@ const Card = ({ product, categoryName }) => {
 
         const cartItem = {
             id: product.id,
+            variantId: currentVariant.id,
             name: productName,
             offerPrice: currentVariant.offerPrice,
             image: productImage,

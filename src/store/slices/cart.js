@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getSessionId } from '../LocalStorage';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {getSessionId} from '../LocalStorage';
 
 const initialState = {
     items: [],
@@ -47,7 +47,7 @@ export const addItemToCartAsync = createAsyncThunk(
     'cart/addItemToCart',
     async (item) => {
         const sessionId = getSessionId();
-        const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.id}`, {
+        const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.variantId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -85,8 +85,7 @@ export const removeItemFromCartAsync = createAsyncThunk(
         });
 
         if (!response.ok) throw new Error('Failed to remove item from cart');
-        const data = await response.json();
-        return data;
+        return await response.json();
     }
 );
 
