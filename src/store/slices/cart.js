@@ -17,6 +17,7 @@ export const fetchCartItemsAsync = createAsyncThunk(
     'cart/fetchCartItems',
     async () => {
         const sessionId = getSessionId();
+        console.log(sessionId);
         const response = await fetch(`${base_url}/store/${brand_id}/cart`, {
             headers: {
                 'Content-Type': 'application/json',
