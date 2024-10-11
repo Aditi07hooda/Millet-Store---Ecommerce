@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Card from './Elements/Card';
 import Loader from './UI/Loader';
+import { getSessionId } from '@/store/LocalStorage';
 
 const Product = () => {
     const [products, setProducts] = useState([]);
@@ -13,7 +14,11 @@ const Product = () => {
     useEffect(() => {
         const getProducts = async () => {
             try {
-                const response = await fetch(`${base_url}/store/${brand_id}/products`);
+                const response = await fetch(`${base_url}/store/${brand_id}/products`, {
+                    headers: {
+                        "session" : getSessionId(),
+                    }
+                });
                 if (!response.ok) {
                     throw new Error(`Error: ${response.status} ${response.statusText}`);
                 }

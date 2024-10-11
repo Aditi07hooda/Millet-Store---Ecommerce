@@ -19,9 +19,7 @@ export const fetchCartItemsAsync = createAsyncThunk(
         const sessionId = getSessionId();
         console.log(sessionId);
         const response = await fetch(`${base_url}/store/${brand_id}/cart`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization' : `Bearer ${sessionId}`,
+            headers: {   
                 'session': sessionId,
             },
         });
@@ -53,8 +51,11 @@ export const addItemToCartAsync = createAsyncThunk(
                 'Content-Type': 'application/json',
                 'Authorization' : `Bearer ${sessionId}`,
                 'session': sessionId,
+                'variantName' : item.size,
             },
-            body: JSON.stringify(item),
+            body: JSON.stringify({
+                'variantName' : item.size,
+            }),
         });
 
         if (!response.ok) {
