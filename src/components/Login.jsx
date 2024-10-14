@@ -30,6 +30,8 @@ const Login = () => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/json',
+                    'Authorization' : `Bearer ${getSessionId()}`,
+                    'session': getSessionId(),
                 },
                 body: new URLSearchParams({
                     mobile: contactNumber,
@@ -66,6 +68,7 @@ const Login = () => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization' : `Bearer ${getSessionId()}`,
+                    'session': getSessionId(),
                     'Accept': 'application/json',
                 },
                 body: new URLSearchParams({
@@ -92,8 +95,6 @@ const Login = () => {
             console.log(state)
             setSessionId(data.session);
             router.push('/user');
-            // if (state.isValid) {
-            // }
         } catch (error) {
             console.error('Error validating OTP', error);
             setState((prevState) => ({

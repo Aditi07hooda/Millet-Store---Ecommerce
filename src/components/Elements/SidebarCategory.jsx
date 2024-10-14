@@ -4,6 +4,7 @@ import { Card, Typography, List, ListItem } from "@material-tailwind/react";
 import { Disclosure } from "@headlessui/react";
 import Loader from '../UI/Loader';
 import { useRouter } from 'next/router';
+import { getSessionId } from "@/store/LocalStorage";
 
 export default function SidebarCategory({ isMobile }) {
   const [categories, setCategories] = useState([]);
@@ -17,7 +18,11 @@ export default function SidebarCategory({ isMobile }) {
   useEffect(() => {
     const getCategories = async () => {
       try {
-        const response = await fetch(`${base_url}/store/${brand_id}/categories`);
+        const response = await fetch(`${base_url}/store/${brand_id}/categories`, {
+          header: {
+            "session": getSessionId(),
+          },
+        });
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
@@ -30,7 +35,7 @@ export default function SidebarCategory({ isMobile }) {
         setLoading(false);
       }
     };
-    
+
     getCategories();
   }, [base_url, brand_id]);
 
