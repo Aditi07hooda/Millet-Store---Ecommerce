@@ -52,9 +52,7 @@ const CardDetails = ({ product }) => {
   };
 
   // The displayed price and saved percentage based on the selected variant
-  console.log(state.selectedVariant)
   const currentVariant = state.selectedVariant || formattedVariants[0];
-  console.log(currentVariant)
   const savedPercentage = calculateSavedPercentage(
     currentVariant.price,
     currentVariant.offerPrice
@@ -62,13 +60,15 @@ const CardDetails = ({ product }) => {
 
   // Handle Add to Cart
   const handleAddToCart = () => {
-    if (!state.selectedSize) {
+    if (!state.selectedSize || !currentVariant) {
       alert('Please select a variant and size');
       return;
     }
 
     const cartItem = {
       id: currentVariant.id,
+      variantId: currentVariant.id,
+      productId: product.id,
       name: currentVariant.name,
       offerPrice: currentVariant.offerPrice,
       image: productImage,
