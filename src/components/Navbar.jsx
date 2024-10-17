@@ -25,6 +25,7 @@ const Navbar = () => {
   const cartCount = String(cartItems.length);
 
   const navigation = [
+    { name: "Blog", href: "/blog", current: false },
     { name: "About us", href: "/about", current: false },
     { name: "Contact us", href: "/contact", current: false },
     // { name: 'Team', href: '#', current: false },
