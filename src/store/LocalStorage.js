@@ -1,5 +1,7 @@
 export const setSessionId = (sessionId) => {
-  localStorage.setItem("sessionId", sessionId);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem("sessionId", sessionId);
+  }
 }
 
 export const getSessionId = () => {
@@ -9,7 +11,9 @@ export const getSessionId = () => {
 }
 
 export const setUserData = (userData) => {
-  localStorage.setItem("userData", JSON.stringify(userData));
+  if (typeof window!== 'undefined') {
+    localStorage.setItem("userData", JSON.stringify(userData));
+  }
 }
 
 export const getUserData = () => {

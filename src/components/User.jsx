@@ -57,7 +57,7 @@ const User = () => {
       console.log(getSessionId());
       const response = await fetch(`${base_url}/store/${brand_id}/auth/me`, {
         headers: {
-          "session": getSessionId(),
+          session: getSessionId(),
         },
       });
       if (!response.ok) {
@@ -102,8 +102,7 @@ const User = () => {
       const response = await fetch(`${base_url}/store/${brand_id}/auth/me`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "session": getSessionId(),
+          session: getSessionId(),
         },
         body: JSON.stringify({
           id: getSessionId(),

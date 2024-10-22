@@ -20,7 +20,7 @@ export const fetchCartItemsAsync = createAsyncThunk(
         console.log(sessionId);
         const response = await fetch(`${base_url}/store/${brand_id}/cart`, {
             headers: {   
-                'session': sessionId,
+                session: sessionId,
             },
         });
         console.log(sessionId)
@@ -40,7 +40,7 @@ export const fetchCartItemsAsync = createAsyncThunk(
     }
 );
 
-// Async thunk for adding an item to the cart or increasing its quantity
+// adding an item to the cart or increasing its quantity
 export const addItemToCartAsync = createAsyncThunk(
     'cart/addItemToCart',
     async (item) => {
@@ -48,10 +48,7 @@ export const addItemToCartAsync = createAsyncThunk(
         const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.variantId}`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization' : `Bearer ${sessionId}`,
-                'session': sessionId,
-                'variantName' : item.size,
+                session: sessionId,
             },
             body: JSON.stringify({
                 'variantName' : item.size,
@@ -66,6 +63,7 @@ export const addItemToCartAsync = createAsyncThunk(
         }
         const data = await response.json();
         console.log(data);
+        fetchCartItemsAsync()
         return {
             ...data,
             variantImage: item.image,
@@ -81,7 +79,7 @@ export const removeItemFromCartAsync = createAsyncThunk(
         const response = await fetch(`${base_url}/store/${brand_id}/cart?id=${item.variantId}`, {
             method: 'DELETE',
             headers: {
-                'session': sessionId,
+                session: sessionId,
             },
         });
 

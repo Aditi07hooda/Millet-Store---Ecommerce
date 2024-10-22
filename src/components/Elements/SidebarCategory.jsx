@@ -20,7 +20,7 @@ export default function SidebarCategory({ isMobile }) {
       try {
         const response = await fetch(`${base_url}/store/${brand_id}/categories`, {
           header: {
-            "session": getSessionId(),
+            session: getSessionId(),
           },
         });
         if (!response.ok) {

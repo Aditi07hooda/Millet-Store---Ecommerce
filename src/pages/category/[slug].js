@@ -41,7 +41,7 @@ export async function getStaticPaths() {
   // Fetch categories to get their IDs
   const res = await fetch(`${base_url}/store/${brand_id}/categories`, {
     headers: { 
-      "session": getSessionId(),
+      session: getSessionId(),
     },
   });
   const categories = await res.json();
@@ -64,14 +64,14 @@ export async function getStaticProps({ params }) {
   const res = await fetch(
     `${base_url}/store/${brand_id}/categories/${slug}/products`,
     {
-      headers: { "session": getSessionId(), },
+      headers: { session: getSessionId(), },
     }
   );
   const products = await res.json();
 
   // Fetch category info to get the name
   const categoryRes = await fetch(`${base_url}/store/${brand_id}/categories`, {
-    headers: { "session": getSessionId(), },
+    headers: { session: getSessionId(), },
   });
   const categories = await categoryRes.json();
   const category = categories.find((cat) => cat.id === slug);
