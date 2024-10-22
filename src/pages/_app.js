@@ -6,7 +6,7 @@ import {useEffect, useState} from "react";
 import Loader from "@/components/UI/Loader";
 import MobileBottomNavbar from "@/components/UI/MobileBottomNavbar";
 import Footer from "@/components/Footer";
-import { getSessionId, getUserData, setSessionId } from "@/store/LocalStorage";
+import { getSessionId, setSessionId } from "@/store/LocalStorage";
 
 export default function App({Component, pageProps}) {
     const base_url = process.env.NEXT_PUBLIC_BASE_URL;

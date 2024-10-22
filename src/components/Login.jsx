@@ -93,7 +93,7 @@ const Login = () => {
             }));
             console.log(state)
             setSessionId(data.session);
-            router.push('/user');
+            router.push('/user/account');
         } catch (error) {
             console.error('Error validating OTP', error);
             setState((prevState) => ({
