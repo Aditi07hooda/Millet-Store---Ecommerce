@@ -89,7 +89,7 @@ const CardDetails = ({ product }) => {
           layout="responsive"
           width={4}
           height={3}
-          objectFit="cover"
+          // objectFit="cover"
           sizes="(max-width: 768px) 100vw, 50vw"
         />
         <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">

@@ -27,7 +27,7 @@ const HeaderBottom = () => {
                             alt={item.name}
                             width={100}
                             height={100}
-                            objectFit="cover"
+                            // objectFit="cover"
                         />
                         <p className="text-sm font-semibold text-center mt-2 flex flex-wrap">{item.name}</p>
                     </div>

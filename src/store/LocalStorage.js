@@ -1,4 +1,5 @@
 export const setSessionId = (sessionId) => {
+  console.log('setSessionId', sessionId)
   if (typeof window !== 'undefined') {
     localStorage.setItem("sessionId", sessionId);
   }

@@ -18,9 +18,10 @@ export default function SidebarCategory({ isMobile }) {
   useEffect(() => {
     const getCategories = async () => {
       try {
+        let sessionId = getSessionId();
         const response = await fetch(`${base_url}/store/${brand_id}/categories`, {
-          header: {
-            session: getSessionId(),
+          headers: {
+            session: sessionId,
           },
         });
         if (!response.ok) {

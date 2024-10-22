@@ -65,13 +65,15 @@ const Card = ({ product, categoryName }) => {
           className="relative h-44"
           onClick={togglePopover}
         >
-          <Image
+          {productImage &&  <Image
             src={productImage}
             alt={productName}
             className="h-auto max-w-full rounded-lg"
-            layout="fill"
-            objectFit="cover"
-          />
+            width={100}
+            height={100}
+            //layout="fill"
+            // objectFit="cover"
+          />}
         </CardHeader>
         <CardBody onClick={togglePopover}>
           <div className="mb-1 flex items-center justify-between">

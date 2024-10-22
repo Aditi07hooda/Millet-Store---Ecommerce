@@ -39,9 +39,11 @@ export async function getStaticPaths() {
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
   // Fetch categories to get their IDs
+  let sessionId = getSessionId();
+  console.log('loadCategories with session', sessionId)
   const res = await fetch(`${base_url}/store/${brand_id}/categories`, {
     headers: { 
-      session: getSessionId(),
+      session: sessionId,
     },
   });
   const categories = await res.json();
