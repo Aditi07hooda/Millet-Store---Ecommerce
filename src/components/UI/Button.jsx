@@ -7,7 +7,7 @@ const Button = ({text, onClick, disabled}) => {
                 type="submit"
                 onClick={onClick}
                 disabled={disabled}
-                className="flex-none rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-secondary hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className={`flex-none rounded-md ${disabled ? "cursor-not-allowed" : "cursor-pointer"} bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-secondary hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
             >
                 {text}
             </button>

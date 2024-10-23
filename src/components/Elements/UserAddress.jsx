@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Button from "../UI/Button";
 import { getSessionId } from "@/store/LocalStorage";
+import { MdAddCall } from "react-icons/md";
 
 export default function UserAddress() {
   const [userFormData, setUserFormData] = useState({
@@ -11,8 +12,9 @@ export default function UserAddress() {
       apartment: "",
       landmark: "",
       city: "",
-      pincode: "",
+      pinCode: "",
       phone: "",
+      address: "",
       id: null, // Used to track if we are editing an existing address
     },
     existingAddress: [],
@@ -47,22 +49,25 @@ export default function UserAddress() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (userFormData.Address.id) {
-      // Update the address if the ID exists
       updateAddress(userFormData.Address.id);
     } else {
-      // Save a new address if no ID exists
       saveAddress();
     }
   };
 
   const saveAddress = async () => {
+    console.log("save address", userFormData.Address);
     const res = await fetch(`${base_url}/store/${brand_id}/auth/address`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         session: getSessionId(),
       },
-      body: JSON.stringify(userFormData.Address),
+      body: JSON.stringify({...userFormData.Address,
+        pincode : userFormData.Address.pinCode,
+        name: userFormData.Address.person,
+        phone: userFormData.Address.mobile,
+      }),
     });
     if (!res.ok) {
       const errorMessage = await res.text();
@@ -109,13 +114,25 @@ export default function UserAddress() {
   };
 
   const updateAddress = async (addressId) => {
+    console.log("update address ",userFormData.Address);
     const res = await fetch(`${base_url}/store/${brand_id}/auth/address/${addressId}`, {
-      method: "PUT",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         session: getSessionId(),
       },
-      body: JSON.stringify(userFormData.Address),
+      body: JSON.stringify({
+        name: userFormData.Address.name,
+        phone: userFormData.Address.phone,
+        door: userFormData.Address.door,
+        apartment: userFormData.Address.apartment,
+        landmark: userFormData.Address.landmark,
+        city: userFormData.Address.city,
+        pincode: userFormData.Address.pinCode,
+        email: userFormData.Address.email,
+        address: userFormData.Address.address,
+        id: addressId,
+      }),
     });
     if (!res.ok) {
       const errorMessage = await res.text();
@@ -153,14 +170,45 @@ export default function UserAddress() {
     if (addressToEdit) {
       setUserFormData((prevFormData) => ({
         ...prevFormData,
-        Address: { ...addressToEdit },
+        Address: {
+            ...addressToEdit,
+            id: addressId,
+            email: userFormData.Address.email,
+            name: addressToEdit.person,
+            phone: addressToEdit.mobile,
+         },
         isAddressSaved: false,
       }));
     }
   };
 
+  const me = async() => {
+    const response = await fetch(`${base_url}/store/${brand_id}/auth/me`, {
+      headers: {
+        "session": getSessionId(),
+      },
+    });
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      console.error(`Error: ${errorMessage}`);
+      return;
+    }
+    const data = await response.json();
+    console.log(data);
+    // Set user details here
+    setUserFormData((prev)=> {
+        return {
+         ...prev,
+          Address: {
+            email: data.email,
+          },
+        }
+    })
+  }
+
   useEffect(() => {
     fetchAddress();
+    me(); 
   }, []);
 
   return (
@@ -172,14 +220,13 @@ export default function UserAddress() {
           {userFormData.existingAddress.length > 0 ? (
             userFormData.existingAddress.map((address, index) => (
               <div key={index} className="border p-4 rounded-lg bg-gray-50 shadow-md">
-                <p className="text-gray-700 font-bold capitalize">{address.name}</p>
-                <p className="text-gray-600">{address.phone}</p>
+                <p className="text-gray-700 font-bold capitalize">{address.person}</p>
+                <p className="text-gray-600 flex flex-wrap gap-2 align-middle font-semibold"><MdAddCall className="text-xl" /> {address.mobile}</p>
                 <p className="text-gray-600">
                   {address.door}, {address.apartment}, {address.landmark}
                 </p>
-                <p className="text-gray-600">{address.city}, {address.pincode}</p>
+                <p className="text-gray-600">{address.city}, {address.pinCode}</p>
                 <Button
-                  type="button"
                   text="Edit"
                   onClick={() => handleEditClick(address.id)}
                 />
@@ -197,17 +244,17 @@ export default function UserAddress() {
           {userFormData.Address.id ? "Edit Address" : "Add New Address"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {["name", "phone", "email", "door", "apartment", "address", "landmark", "city", "pincode"].map((field) => (
+          {["person", "mobile", "door", "apartment", "address", "landmark", "city", "pinCode"].map((field) => (
             <div key={field} className="flex flex-col">
               <label className="text-gray-700 capitalize">{field}</label>
               <input
-                type={field === "email" ? "email" : "text"}
+                type="text"
                 name={field}
                 data-section="Address"
                 value={userFormData.Address[field]}
                 onChange={handleChange}
                 className="px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-                required
+                required = {field === "landmark" ? "" : "required"}
               />
             </div>
           ))}

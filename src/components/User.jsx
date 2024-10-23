@@ -171,7 +171,7 @@ const User = () => {
 
   return (
     <>
-      <div className="w-full max-w-md px-6 bg-white rounded-lg py-8 my-9">
+      <div className="w-full max-w-md px-6 bg-white rounded-lg py-8 my-2">
         <h2 className="text-2xl font-semibold text-center mb-6">My Account</h2>
         <div className="flex gap-5 border-2 justify-around mb-2 bg-secondary bg-opacity-45">
           {data.map((value, index) => (
