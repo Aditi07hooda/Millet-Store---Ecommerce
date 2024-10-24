@@ -12,14 +12,13 @@ export default function Checkout() {
   const dispatch = useDispatch();
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
-  const { Razorpay } = useRazorpay();
 
   const cartItems = useSelector((state) => state.cart.items);
-
+  const [Razorpay] = useRazorpay();
   const [state, setState] = useState({
     addresses: [],
     selectedAddress: null,
-    checkoutDetails: null, // Initialize as null to check for data availability
+    checkoutDetails: null,
     loading: false,
     error: null,
     order_id: "",
@@ -64,44 +63,57 @@ export default function Checkout() {
     }
   };
 
-  console.log("selected address : ", state.selectedAddress)
-
   const handleStartPayment = async () => {
     try {
-        const res = await fetch(`${base_url}/store/${brand_id}/auth/checkout/payment?address_id=${state.selectedAddress.id}`,{
-            method: "POST",
-            headers: {
-                session: getSessionId(),
-            },
-        })
-        if (!res.ok) throw new Error("Failed to start payment");
-        const data = await res.json();
-        console.log("Payment started", data);
-        setState((prev) => ({
-         ...prev,
-          loading: true,
-          order_id: data.order_id,
-        }));
-        // Redirect to Razorpay checkout page
-        const options = {
-          key: process.env.RAZORPAY_KEY,
-          amount: state.checkoutDetails.total_amount * 100, // amount should be in paise
-          currency: "INR",
-          name: "Millets",
-          order_id: state.order_id,
-          description: "Millets Store",
-          image: `${base_url}/static/logo.png`,
-          handler: handlePaymentComplete,
-          prefill: {
-            name: state.checkoutDetails.customer_name,
-            email: state.checkoutDetails.customer_email,
-            contact: state.checkoutDetails.customer_contact,
+      if (!state.selectedAddress) {
+        throw new Error("Please select an address.");
+      }
+
+      const res = await fetch(
+        `${base_url}/store/${brand_id}/auth/checkout/payment?address_id=${state.selectedAddress.id}`,
+        {
+          method: "POST",
+          headers: {
+            session: getSessionId(),
           },
-        };
-        const razorpay = new Razorpay(options);
-        razorpay.open();
+        }
+      );
+      if (!res.ok) throw new Error("Failed to start payment");
 
+      const data = await res.json();
+      setState((prev) => ({
+        ...prev,
+        loading: true,
+        order_id: data.order_id,
+      }));
 
+      data["handler"] = async (response) => {
+        await handlePaymentComplete(response);
+      };
+      data["modal"] = {
+        ondismiss: async () => {
+          console.log("payment window dismissed");
+          await enablePayBtn("payment abandoned", null);
+        },
+      };
+
+      let rzp1 = new Razorpay(data);
+      rzp1.on("payment.failed", async (response) => {
+        console.error("Payment failed:", response.error.code);
+        console.error("payment error", response.error.description);
+        console.error("payment error", response.error.source);
+        console.error("payment error", response.error.step);
+        console.error("payment error", response.error.reason);
+        console.error("payment error", response.error.metadata.order_id);
+        console.error("payment error", response.error.metadata.payment_id);
+        await handlePaymentCancel(
+          "payment failed",
+          response.error.metadata.order_id
+        );
+      });
+
+      rzp1.open();
+      console.log("Payment started");
     } catch (error) {
       console.error("Error starting payment: ", error);
       setState((prev) => ({
@@ -112,7 +124,7 @@ export default function Checkout() {
     }
   };
 
-  const handlePaymentComplete = async (r) => {
+  const handlePaymentComplete = async (response) => {
     try {
       const res = await fetch(
         `${base_url}/store/${brand_id}/auth/checkout/payment/complete`,
@@ -121,14 +133,13 @@ export default function Checkout() {
           headers: {
             session: getSessionId(),
           },
-          body: JSON.stringify(r),
+          body: JSON.stringify(response),
         }
       );
-
       if (!res.ok) throw new Error("Failed to complete payment");
 
       const data = await res.json();
-      console.log("payment completed", data);
+      console.log("Payment completed", data);
 
       setState((prev) => ({
         ...prev,
@@ -145,6 +156,38 @@ export default function Checkout() {
         isPaymentFailure: true,
         error: "Payment failed",
       }));
+    }
+  };
+
+  const enablePayBtn = async (reason, order) => {
+    console.log("Enable Payment Button again for", reason, order);
+    await handlePaymentCancel(reason, order);
+  };
+
+  const handlePaymentCancel = async (reason, orderId) => {
+    try {
+      const payload = { reason, orderId };
+      const res = await fetch(
+        `${base_url}/store/${brand_id}/auth/checkout/payment`,
+        {
+          method: "DELETE",
+          headers: {
+            session: getSessionId(),
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+      if (!res.ok) throw new Error("Failed to cancel payment");
+      const data = await res.json();
+      console.log("Payment cancelled", data);
+      setState((prevState) => ({
+        ...prevState,
+        isPaymentFailure: false,
+        loading: false,
+        error: "Payment Cancelled",
+      }));
+    } catch (error) {
+      console.error("Payment cannot be cancelled", error);
     }
   };
 
@@ -166,7 +209,7 @@ export default function Checkout() {
       <h2 className="text-2xl font-semibold mb-6">Checkout</h2>
 
       {/* Address Selection */}
-      <div>
+      <div className="cursor-default">
         <h2 className="text-xl font-semibold mb-4">Select Address</h2>
         <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
           {state.addresses.map((address) => (
@@ -202,7 +245,7 @@ export default function Checkout() {
       </div>
 
       {/* Items Display */}
-      <div className="mt-6">
+      <div className="mt-6 cursor-default">
         <h2 className="text-xl font-semibold mb-4">Items</h2>
         <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
           {cartItems.length === 0 ? (
@@ -237,7 +280,7 @@ export default function Checkout() {
 
       {/* Total Bill */}
       {state.checkoutDetails && (
-        <div className="border p-4 rounded-lg mt-6 bg-gray-50 shadow-md">
+        <div className="border p-4 rounded-lg mt-6 bg-gray-50 shadow-md cursor-default">
           <h3 className="text-lg font-semibold mb-3">Order Summary</h3>
           <ul className="space-y-2">
             <li className="flex justify-between">
@@ -249,60 +292,26 @@ export default function Checkout() {
               <span>Rs. {state.checkoutDetails.discountAmt?.toFixed(2)}</span>
             </li>
             <li className="flex justify-between">
-              <span>After Discount</span>
+              <span>Shipping Charges</span>
               <span>
-                Rs. {state.checkoutDetails.orderValAfterDiscount?.toFixed(2)}
+                Rs. {state.checkoutDetails.shippingCharges?.toFixed(2)}
               </span>
             </li>
-            <li className="">
-              <div className="flex justify-between">
-                <span>Shipping Charges</span>
-                <span>
-                  Rs. {state.checkoutDetails.shippingCharges?.toFixed(2)}
-                </span>
-              </div>
-              <p className="flex items-end justify-end">
-                {state.checkoutDetails.orderValue?.toFixed(2) < 699 && (
-                  <p className="text-gray-500">
-                    Free shipping applied for orders above Rs. 699 in Bangalore
-                  </p>
-                )}
-              </p>
-            </li>
-            <li className="flex justify-between border-t pt-2 font-bold">
-              <span>Total</span>
-              <span>
+            <li className="flex justify-between">
+              <strong>Total Payable</strong>
+              <strong>
                 Rs. {state.checkoutDetails.totalOrderValue?.toFixed(2)}
-              </span>
+              </strong>
             </li>
           </ul>
         </div>
       )}
 
-      {/* note */}
-      <div className="my-3 border-2 bg-secondary bg-opacity-50 p-2 rounded-md border-secondary">
-        <h5 className="text-[17px] font-semibold">Please Note :</h5>
-        <p className="text-gray-600 text-sm leading-relaxed">
-          Orders on Shipped within 2 working days.
-          <br /> Orders may take Upto 7 working days to be delivered after
-          shipping.
-          <br /> Our Working Days are Monday to Saturday.
-          <br /> We are Closed on Sunday.
-          <br /> Our Working Hours are 9AM to 6PM.
-          <br /> For Any enquiries about your order you can Call/WhatsApp us on
-          6362033034.
-        </p>
-      </div>
-
-      {/* Checkout Button */}
+      {/* Payment Button */}
       <Button
-        text="Pay & Place Order"
-        onClick={() => {
-          // Redirect to checkout page with selected address
-          // (Assuming checkout page is a separate component)
-          // window.location.href = "/checkout";
-        }}
-        disabled={state.selectedAddress === null || cartItems.length === 0}
+        text={state.loading ? "Processing..." : "Place Order"}
+        onClick={handleStartPayment}
+        disabled={state.loading}
       />
     </div>
   );
