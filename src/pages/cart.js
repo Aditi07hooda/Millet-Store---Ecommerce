@@ -13,15 +13,6 @@ import { getSessionId } from "@/store/LocalStorage";
 
 const Cart = () => {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
-  const totalQuantity = useSelector((state) => state.cart.totalQuantity);
-  const totalAmount = useSelector((state) => state.cart.totalAmount);
-  const shipping = 0.0;
-  const totalPrice = totalAmount + shipping;
-
-  const base_url = process.env.NEXT_PUBLIC_BASE_URL;
-  const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
-
   const [state, setState] = useState({
     disable: false,
     discountInput: "",
@@ -29,6 +20,13 @@ const Cart = () => {
     discountError: "",
     discount: 0,
   });
+  const cartItems = useSelector((state) => state.cart.items);
+  const totalQuantity = useSelector((state) => state.cart.totalQuantity);
+  const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const totalPrice = totalAmount - state.discount;
+
+  const base_url = process.env.NEXT_PUBLIC_BASE_URL;
+  const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
   // handle diablity of checkout and discount button
   useEffect(() => {
@@ -52,16 +50,19 @@ const Cart = () => {
     }));
   };
 
-  const handleApplyDiscount = async() => {
-    console.log(state.discountInput)
+  const handleApplyDiscount = async () => {
+    console.log(state.discountInput);
     try {
-      const res = await fetch(`${base_url}/store/${brand_id}/auth/checkout/discount`,{
-        method: "POST",
-        headers: {
-          session : getSessionId(),
-        },
-        body: JSON.stringify({ code: state.discountInput }),
-      })
+      const res = await fetch(
+        `${base_url}/store/${brand_id}/auth/checkout/discount`,
+        {
+          method: "POST",
+          headers: {
+            session: getSessionId(),
+          },
+          body: JSON.stringify({ code: state.discountInput }),
+        }
+      );
       if (!res.ok) {
         throw new Error("Failed to apply discount");
       }
@@ -75,17 +76,16 @@ const Cart = () => {
         discount: data,
       }));
       // Update total amount after discount code
-
     } catch (error) {
       console.error(error);
-      setState((prev)=>({
+      setState((prev) => ({
         ...prev,
         discountInput: "",
         discountApplied: false,
         discountError: "Discount Code is Not Applicable now",
-      }))
+      }));
     }
-  }
+  };
 
   // Fetch cart items on component mount
   useEffect(() => {
@@ -183,20 +183,18 @@ const Cart = () => {
       <div className="w-full md:w-1/3 md:pl-8 mt-6 md:mt-0">
         <h2 className="text-lg font-semibold mb-4">Discount</h2>
         <div className="border p-4 rounded mb-4">
-          {
-            state.discountApplied ? (
-              <>
+          {state.discountApplied ? (
+            <>
               <p className="text-green-500 text-sm">
                 Discount code applied successfully.
               </p>
               <p className="text-gray-600 text-sm">
                 Discount: -Rs. {state.discount.toFixed(2)}
               </p>
-              </>
-            ) : (
-              <p className="text-red-500 text-sm">{state.discountError}</p>
-            )
-          }
+            </>
+          ) : (
+            <p className="text-red-500 text-sm">{state.discountError}</p>
+          )}
           <input
             type="text"
             placeholder="Discount code"
@@ -205,7 +203,11 @@ const Cart = () => {
             value={state.discountInput}
             disabled={state.disable}
           />
-          <Button text={"Apply"} disabled={state.disable} onClick={handleApplyDiscount}></Button>
+          <Button
+            text={"Apply"}
+            disabled={state.disable}
+            onClick={handleApplyDiscount}
+          ></Button>
         </div>
         <div className="border p-4 rounded mb-4">
           <ul className="space-y-2">
@@ -214,24 +216,20 @@ const Cart = () => {
               <span>Rs. {totalAmount.toFixed(2)}</span>
             </li>
             <li className="flex justify-between">
-              <span>Shipping</span>
-              <span>Rs. {shipping.toFixed(2)}</span>
+              <span>Discount</span>
+              <span>Rs. {state.discount.toFixed(2)}</span>
             </li>
             <li className="flex justify-between border-t pt-2">
-              <span>Total (tax excl.)</span>
-              <span>Rs. {totalPrice.toFixed(2)}</span>
-            </li>
-            <li className="flex justify-between font-semibold border-t pt-2">
-              <span>Total (tax incl.)</span>
+              <span>Total</span>
               <span>Rs. {(totalAmount - state.discount).toFixed(2)}</span>
-            </li>
-            <li className="text-right text-sm text-gray-500">
-              Taxes: Rs. 0.00
             </li>
           </ul>
         </div>
         <Link href={"/user/checkout"}>
-          <Button text={"Proceed To Checkout"} disabled={state.disable}></Button>
+          <Button
+            text={"Proceed To Checkout"}
+            disabled={state.disable}
+          ></Button>
         </Link>
       </div>
     </div>
