@@ -6,7 +6,7 @@ import {useEffect, useState} from "react";
 import Loader from "@/components/UI/Loader";
 import MobileBottomNavbar from "@/components/UI/MobileBottomNavbar";
 import Footer from "@/components/Footer";
-import { getSessionId, setSessionId } from "@/store/LocalStorage";
+import { getSessionId, setBannerMobileImage, setBannerWebImage, setSessionId } from "@/store/LocalStorage";
 
 export default function App({Component, pageProps}) {
     const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -30,6 +30,9 @@ export default function App({Component, pageProps}) {
                 if (response.ok) {
                     const data = await response.json();
                     setSessionId(data.session);
+                    console.log("session data",data.brand.banners[0].name)
+                    setBannerWebImage(data.brand.banners[0]);
+                    setBannerMobileImage(data.brand.bannersForMobile[0]);
                 }
             }
         } catch (error) {

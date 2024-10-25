@@ -1,34 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import React from "react";
+import Loader from "../UI/Loader";
+import { getBannerWebImage } from "@/store/LocalStorage";
+import { useRouter } from "next/router";
 
-const Carousel = ({ images, autoSlide = true, autoSlideInterval = 3000 }) => {
-    const [currentIndex, setCurrentIndex] = useState(0);
+const Carousel = () => {
+  const router = useRouter();
+  if (getBannerWebImage() == null || getBannerWebImage() == undefined) {
+    return <Loader />;
+  }
+  const bannerWeb = JSON.parse(getBannerWebImage());
+  const images = [bannerWeb.name];
+  const imageLinkTo = [bannerWeb.link];
+  console.log("banner detail in header", bannerWeb, imageLinkTo);
 
-    useEffect(() => {
-        if (autoSlide) {
-            const slideInterval = setInterval(() => {
-                setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-            }, autoSlideInterval);
-            return () => clearInterval(slideInterval);
-        }
-    }, [autoSlide, autoSlideInterval, images.length]);
-
-
-    return (
-        <div className="relative w-full max-w-[830px] mx-auto mb-2">
-            <div className="relative">
-                {images.map((image, index) => (
-                    <div
-                        key={index}
-                        className={`${index === currentIndex ? 'translate-x-0' : 'translate-x-full'
-                            }`}
-                    >
-                        <Image src={image} alt={`Slide ${index}`} className="w-full h-full object-cover rounded-lg" />
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+  return (
+    <div className="relative w-full max-w-[830px] mx-auto mb-2">
+      <div className="relative">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={``}
+            onClick={() => router.push(imageLinkTo[0])}
+          >
+            <img
+              src={image}
+              alt={`Slide ${index}`}
+              className="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default Carousel;

@@ -19,6 +19,7 @@ import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import SearchBar from "./UI/SearchBar";
+import { current } from "@reduxjs/toolkit";
 
 const Navbar = () => {
   const cartItems = useSelector((state) => state.cart.items);
@@ -28,7 +29,7 @@ const Navbar = () => {
     { name: "Blog", href: "/blog", current: false },
     { name: "About us", href: "/about", current: false },
     { name: "Contact us", href: "/contact", current: false },
-    // { name: 'Team', href: '#', current: false },
+    {name: "Collections", href: "/collections", current: false},
   ];
 
   function classNames(...classes) {
@@ -45,26 +46,30 @@ const Navbar = () => {
     },
   }));
 
+  const logoutHandler = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
+
   return (
     <>
       <Disclosure as="nav" className="bg-secondary sticky top-0 z-10">
         <div className="mx-auto px-2 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between">
-            <div className="flex items-center justify-between sm:items-stretch sm:justify-start">
+            <div className="flex items-center justify-between sm:items-stretch sm:justify-start cursor-pointer">
               <Link href="/">
-                <div className="flex flex-shrink-0 items-center">
+                <div className="flex flex-shrink-0 items-center cursor-pointer">
                   <Image
                     alt="Your Company"
                     src={logo}
-                    className="h-10 w-auto cursor-default"
+                    className="h-10 w-auto"
                   />
-                  <p className="px-4 py-2 text-lg text-black font-semibold cursor-default hidden sm:block">
+                  <p className="px-4 py-2 text-lg text-black font-semibold hidden sm:block">
                     The Millet Store
                   </p>
                 </div>
               </Link>
             </div>
-            <SearchBar />
             <div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
               {/* Mobile menu button */}
               <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-primary-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -139,14 +144,7 @@ const Navbar = () => {
                     </span>
                   </Link>
                   <MenuItem>
-                    <Link href="#">
-                      <span className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-primary data-[focus]:text-white">
-                        Settings
-                      </span>
-                    </Link>
-                  </MenuItem>
-                  <MenuItem>
-                    <Link href="#">
+                    <Link href="/user/account" onClick={logoutHandler}>
                       <span className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-primary data-[focus]:text-white">
                         Sign out
                       </span>

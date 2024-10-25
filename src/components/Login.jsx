@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from './UI/Button';
 import { useRouter } from 'next/router';
-import { getSessionId, setSessionId } from '@/store/LocalStorage';
+import { getSessionId, setSessionId, setUserData } from '@/store/LocalStorage';
 
 const Login = () => {
     const router = useRouter();
@@ -93,6 +93,7 @@ const Login = () => {
             }));
             console.log(state)
             setSessionId(data.session);
+            setUserData(data.user);
             router.push('/user/account');
         } catch (error) {
             console.error('Error validating OTP', error);
@@ -180,7 +181,7 @@ const Login = () => {
                                     onChange={handleInputChange}
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                                     aria-label="OTP"
-                                    placeholder="Enter the OTP"
+                                    placeholder=" Enter the OTP"
                                 />
                             </div>
                         </div>

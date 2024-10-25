@@ -18,7 +18,7 @@ export const fetchCartItemsAsync = createAsyncThunk(
     async () => {
         const sessionId = getSessionId();
         console.log(sessionId);
-        const response = await fetch(`${base_url}/store/${brand_id}/cart`, {
+        const response = await fetch(`${base_url}/store/${brand_id}/cart/full`, {
             headers: {   
                 session: sessionId,
             },
@@ -26,7 +26,7 @@ export const fetchCartItemsAsync = createAsyncThunk(
         console.log(sessionId)
         if (!response.ok) throw new Error('Failed to fetch cart items');
         const data = await response.json();
-        const cartItemsWithImages = data.items.map(item => {
+        const cartItemsWithImages = data.cart.items.map(item => {
             const storedImage = localStorage.getItem(`image_${item.variantId}`);
 
             return {

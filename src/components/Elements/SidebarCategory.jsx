@@ -67,7 +67,7 @@ export default function SidebarCategory({ isMobile }) {
                 {categories.map((category) => (
                   <ListItem
                     key={category.id} // Use category.id for the key
-                    onClick={() => handleCategoryClick(category.id)} // Use category.id as slug
+                    onClick={() => handleCategoryClick(category.slug)} // Use category.slug as slug
                     className="relative hover:bg-primary hover:bg-opacity-20 flex items-center cursor-pointer text-black"
                   >
                     {category.imageUrl && (

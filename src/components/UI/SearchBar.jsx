@@ -68,9 +68,9 @@ const SearchBar = () => {
   return (
     <>
       <div className="sm:hidden">
-        <div className="shadow-sm mr-10">
+        <div className="shadow-sm">
           <IoSearchOutline
-            className="ml-2 text-2xl font-bold cursor-pointer text-gray-600 transition duration-150 ease-in-out hover:text-gray-800"
+            className="text-2xl font-bold cursor-pointer text-gray-600 transition duration-150 ease-in-out hover:text-gray-800"
             onClick={openSearch}
           />
         </div>
@@ -78,7 +78,7 @@ const SearchBar = () => {
 
       <div className="hidden sm:flex">
         <div className="max-w-md mx-auto">
-          <div className="relative flex items-center w-full h-10 rounded-full shadow-md focus-within:shadow-lg bg-white overflow-hidden transition duration-150">
+          <div className="relative flex items-center w-full h-10 rounded-full shadow-md focus-within:shadow-lg bg-white overflow-hidden transition duration-150" onClick={openSearch}>
             <div className="grid place-items-center h-full w-14 text-gray-400">
               <IoSearchOutline className="ml-2 text-xl font-bold" />
             </div>

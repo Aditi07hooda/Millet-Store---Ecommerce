@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Card from "./Elements/Card";
 import Loader from "./UI/Loader";
-import { Carousel } from "@material-tailwind/react"; // Import React Slick
 import { getSessionId } from "@/store/LocalStorage";
 
 const Product = () => {
@@ -53,11 +52,13 @@ const Product = () => {
         Object.entries(categorizedProducts).map(([categoryName, products]) => (
           <section key={categoryName} className="mb-8">
             <h2 className="text-xl font-semibold mb-4">{categoryName}</h2>
-            {products.map((product) => (
-              <div key={product.id}>
-                <Card product={product} categoryName={categoryName} />
-              </div>
-            ))}
+            <div className="grid grid-flow-row lg:grid-cols-5 lg:gap-3 grid-cols-2 gap-2">
+              {products.map((product) => (
+                <div key={product.id}>
+                  <Card product={product} categoryName={categoryName} />
+                </div>
+              ))}
+            </div>
           </section>
         ))
       ) : (

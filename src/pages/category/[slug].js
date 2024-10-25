@@ -38,19 +38,19 @@ export async function getStaticPaths() {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
-  // Fetch categories to get their IDs
-  let sessionId = getSessionId();
-  console.log('loadCategories with session', sessionId)
+  // Fetch categories to get their slug name
+  const sessionId = getSessionId();
+  console.log("loadCategories with session", sessionId);
   const res = await fetch(`${base_url}/store/${brand_id}/categories`, {
-    headers: { 
+    headers: {
       session: sessionId,
     },
   });
   const categories = await res.json();
 
-  // Create paths for each category using their IDs
+  // Create paths for each category using their slug name
   const paths = categories.map((category) => ({
-    params: { slug: category.id },
+    params: { slug: category.slug },
   }));
 
   return { paths, fallback: true };
@@ -59,32 +59,38 @@ export async function getStaticPaths() {
 // Fetch products for a specific category
 export async function getStaticProps({ params }) {
   const { slug } = params; // Get the slug from params
+  console.log(slug)
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
+  // Fetch categories to find the ID corresponding to the slug
+  const categoryRes = await fetch(`${base_url}/store/${brand_id}/categories`, {
+    headers: { session: getSessionId() },
+  });
+  const categories = await categoryRes.json();
+  const category = categories.find((cat) => cat.slug === slug);
+
+  // Check if category is found
+  if (!category) {
+    return {
+      notFound: true,
+    };
+  }
+
   // Fetch products based on the category ID
   const res = await fetch(
-    `${base_url}/store/${brand_id}/categories/${slug}/products`,
+    `${base_url}/store/${brand_id}/categories/${category.id}/products`,
     {
-      headers: { session: getSessionId(), },
+      headers: { session: getSessionId() },
     }
   );
   const products = await res.json();
 
-  // Fetch category info to get the name
-  const categoryRes = await fetch(`${base_url}/store/${brand_id}/categories`, {
-    headers: { session: getSessionId(), },
-  });
-  const categories = await categoryRes.json();
-  const category = categories.find((cat) => cat.id === slug);
-
   return {
     props: {
       products,
-      categoryName: category ? category.name : "Unknown Category",
-      categoryDescription: category
-        ? category.description
-        : "Unknown Description",
+      categoryName: category.name,
+      categoryDescription: category.description,
     },
     revalidate: 10,
   };

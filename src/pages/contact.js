@@ -6,7 +6,7 @@ import Image from 'next/image';
 const contact = () => {
     return (
         <>
-            <div className='flex flex-col flex-wrap p-2 m-3 gap-8 sm:gap-24 lg:gap-20 sm:m-5 lg:m-5' style={{height: 'calc(100vh - 160px)'}}>
+            <div className='flex flex-col flex-wrap p-2 m-3 gap-8 sm:gap-24 lg:gap-20 sm:m-5 lg:m-5 cursor-default' style={{height: 'calc(100vh - 160px)'}}>
                 <div className='flex flex-col justify-center gap-3'>
                     <Image src={logo} className='w-[20%] h-auto self-center lg:mt-10 lg:w-[10%]' alt='The millet store' />
                     <h1 className='text-xl font-bold text-gray-900 text-center sm:text-2xl lg:text-2xl underline'>

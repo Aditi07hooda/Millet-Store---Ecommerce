@@ -7,14 +7,12 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { HeartIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import Button from "../UI/Button";
-import CardDetails from "./CardDetails";
+import { useRouter } from "next/router";
 
 const Card = ({ product, categoryName }) => {
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
-  const [isPopoverVisible, setIsPopoverVisible] = useState(false); // State to manage popover visibility
-  const [selectedVariant, setSelectedVariant] = useState(null);
 
   const productImage =
     product.oneImg ||
@@ -38,18 +36,11 @@ const Card = ({ product, categoryName }) => {
 
   const randomHashtag = getRandomHashtag(product.keywords);
 
-  // Define the current variant to use in Add to Cart
-  const currentVariant = selectedVariant || formattedVariants[0];
-
   // Handle Add to Cart directly from the Card
   const handleAddToCart = () => {};
 
-  const togglePopover = () => {
-    setIsPopoverVisible(!isPopoverVisible); // Toggle popover visibility
-  };
-
-  const closePopover = () => {
-    setIsPopoverVisible(false); // Close the popover
+  const handleProductClick = (slug) => {
+    router.push(`/product/${slug}`);
   };
 
   return (
@@ -58,24 +49,22 @@ const Card = ({ product, categoryName }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <CardLayout className="bg-secondary bg-opacity-25 transition-transform duration-300">
-        <CardHeader
-          shadow={false}
-          floated={false}
-          className="relative h-44"
-          onClick={togglePopover}
-        >
-          {productImage &&  <Image
-            src={productImage}
-            alt={productName}
-            className="h-auto max-w-full rounded-lg"
-            width={100}
-            height={100}
-            //layout="fill"
-            // objectFit="cover"
-          />}
+      <CardLayout
+        className="bg-secondary bg-opacity-25 transition-transform duration-300 cursor-pointer"
+        onClick={() => handleProductClick(product.slug)}
+      >
+        <CardHeader shadow={"false"} floated={"false"} className="relative">
+          {productImage && (
+            <img
+              src={productImage}
+              alt={productName}
+              className="h-auto max-w-full w-max rounded-lg"
+              //layout="fill"
+              // objectFit="cover"
+            />
+          )}
         </CardHeader>
-        <CardBody onClick={togglePopover}>
+        <CardBody>
           <div className="mb-1 flex items-center justify-between">
             <Typography color="gray" className="font-small text-gray-400">
               {categoryName}
@@ -122,28 +111,6 @@ const Card = ({ product, categoryName }) => {
           </span>
         )}
       </CardLayout>
-
-      {/* Conditionally render the CardDetails popover based on isPopoverVisible state */}
-      {isPopoverVisible && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
-          onClick={closePopover} // Close when clicking outside
-        >
-          <div
-            className="bg-white p-6 rounded-lg shadow-lg w-full max-w-6xl h-3/4 overflow-auto"
-            onClick={(e) => e.stopPropagation()} // Prevent click inside from closing
-          >
-            {/* Close button */}
-            <button
-              className="absolute top-4 right-4 text-gray-700"
-              onClick={closePopover}
-            >
-              ✕
-            </button>
-            <CardDetails product={product} />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

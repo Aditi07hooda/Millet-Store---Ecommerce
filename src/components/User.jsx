@@ -171,13 +171,13 @@ const User = () => {
 
   return (
     <>
-      <div className="w-full max-w-md px-6 bg-white rounded-lg py-8 my-2">
+      <div className="w-full px-6 bg-white rounded-lg py-8 my-2">
         <h2 className="text-2xl font-semibold text-center mb-6">My Account</h2>
-        <div className="flex gap-5 border-2 justify-around mb-2 bg-secondary bg-opacity-45">
+        <div className="flex gap-5 border-2 justify-around mb-2 bg-secondary bg-opacity-45 max-w-md">
           {data.map((value, index) => (
             <div
               key={index}
-              className=" hover:underline hover:underline-offset-8 hover:decoration-primary active:underline active:underline-offset-8 active:decoration-primary p-2 cursor-pointer transition-colors duration-300 transform"
+              className="max-w-md hover:underline hover:underline-offset-8 hover:decoration-primary active:underline active:underline-offset-8 active:decoration-primary p-2 cursor-pointer transition-colors duration-300 transform"
               onClick={() => setProfileTab(value.label)}
             >
               {value.label}

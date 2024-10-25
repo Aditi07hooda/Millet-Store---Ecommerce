@@ -8,7 +8,6 @@ import {
 } from "../store/slices/cart";
 import Link from "next/link";
 import Button from "@/components/UI/Button";
-import { RiDeleteBinLine } from "react-icons/ri";
 import { getSessionId } from "@/store/LocalStorage";
 
 const Cart = () => {
@@ -73,7 +72,7 @@ const Cart = () => {
         discountInput: "",
         discountApplied: true,
         discountError: "",
-        discount: data,
+        discount: data.discountAmt,
       }));
       // Update total amount after discount code
     } catch (error) {
@@ -161,12 +160,6 @@ const Cart = () => {
                           +
                         </button>
                       </div>
-                      <button
-                        className="text-red-500 ml-4"
-                        onClick={() => handleRemoveItem(item)}
-                      >
-                        <RiDeleteBinLine />
-                      </button>
                     </div>
                   </div>
                 </div>
