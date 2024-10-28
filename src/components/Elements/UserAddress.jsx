@@ -21,16 +21,9 @@ export default function UserAddress() {
     isAddressSaved: false,
   });
 
-  const isSaveBtnDisabled =
-    userFormData.Address.name === "" ||
-    userFormData.Address.phone === "" ||
-    userFormData.Address.door === "" ||
-    userFormData.Address.apartment === "" ||
-    userFormData.Address.address === "" ||
-    userFormData.Address.landmark === "" ||
-    userFormData.Address.pincode === "" ||
-    userFormData.Address.city === "" ||
-    userFormData.Address.email === "";
+  const isSaveBtnDisabled = !Object.values(userFormData.Address).every(
+    (field) => field !== "" || field === null 
+  );
 
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
@@ -46,12 +39,12 @@ export default function UserAddress() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (userFormData.Address.id) {
-      updateAddress(userFormData.Address.id);
+      await updateAddress(userFormData.Address.id);
     } else {
-      saveAddress();
+      await saveAddress();
     }
   };
 
@@ -63,23 +56,73 @@ export default function UserAddress() {
         "Content-Type": "application/json",
         session: getSessionId(),
       },
-      body: JSON.stringify({...userFormData.Address,
-        pincode : userFormData.Address.pinCode,
-        name: userFormData.Address.person,
-        phone: userFormData.Address.mobile,
+      body: JSON.stringify({
+        ...userFormData.Address,
+        pincode: userFormData.Address.pinCode,
+        name: userFormData.Address.name,
+        phone: userFormData.Address.phone,
       }),
     });
+
     if (!res.ok) {
       const errorMessage = await res.text();
       console.error(`Error: ${errorMessage}`);
       return;
     }
+
     const data = await res.json();
     console.log(data);
 
+    // Clear the form data after saving
+    resetForm();
     setUserFormData((prevFormData) => ({
       ...prevFormData,
       existingAddress: [...prevFormData.existingAddress, userFormData.Address],
+      isAddressSaved: true,
+    }));
+  };
+
+  const updateAddress = async (addressId) => {
+    console.log("update address ", userFormData.Address);
+    const res = await fetch(
+      `${base_url}/store/${brand_id}/auth/address/${addressId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          session: getSessionId(),
+        },
+        body: JSON.stringify({
+          ...userFormData.Address,
+          id: addressId,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const errorMessage = await res.text();
+      console.error(`Error: ${errorMessage}`);
+      return;
+    }
+
+    const data = await res.json();
+    console.log(data);
+
+    const updatedAddresses = userFormData.existingAddress.map((addr) =>
+      addr.id === addressId ? userFormData.Address : addr
+    );
+
+    resetForm();
+    setUserFormData((prevFormData) => ({
+      ...prevFormData,
+      existingAddress: updatedAddresses,
+      isAddressSaved: true,
+    }));
+  };
+
+  const resetForm = () => {
+    setUserFormData((prevFormData) => ({
+      ...prevFormData,
       Address: {
         name: "",
         email: "",
@@ -87,12 +130,32 @@ export default function UserAddress() {
         apartment: "",
         landmark: "",
         city: "",
-        pincode: "",
+        pinCode: "",
         phone: "",
+        address: "",
         id: null,
       },
-      isAddressSaved: true,
+      isAddressSaved: false,
     }));
+  };
+
+  const handleEditClick = (addressId) => {
+    const addressToEdit = userFormData.existingAddress.find(
+      (addr) => addr.id === addressId
+    );
+    if (addressToEdit) {
+      setUserFormData((prevFormData) => ({
+        ...prevFormData,
+        Address: {
+          ...addressToEdit,
+          id: addressId,
+          email: addressToEdit.email,
+          name: addressToEdit.name,
+          phone: addressToEdit.phone,
+        },
+        isAddressSaved: false,
+      }));
+    }
   };
 
   const fetchAddress = async () => {
@@ -101,11 +164,13 @@ export default function UserAddress() {
         session: getSessionId(),
       },
     });
+
     if (!res.ok) {
       const errorMessage = await res.text();
       console.error(`Error: ${errorMessage}`);
       return;
     }
+
     const data = await res.json();
     setUserFormData((prevFormData) => ({
       ...prevFormData,
@@ -113,102 +178,34 @@ export default function UserAddress() {
     }));
   };
 
-  const updateAddress = async (addressId) => {
-    console.log("update address ",userFormData.Address);
-    const res = await fetch(`${base_url}/store/${brand_id}/auth/address/${addressId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        session: getSessionId(),
-      },
-      body: JSON.stringify({
-        name: userFormData.Address.name,
-        phone: userFormData.Address.phone,
-        door: userFormData.Address.door,
-        apartment: userFormData.Address.apartment,
-        landmark: userFormData.Address.landmark,
-        city: userFormData.Address.city,
-        pincode: userFormData.Address.pinCode,
-        email: userFormData.Address.email,
-        address: userFormData.Address.address,
-        id: addressId,
-      }),
-    });
-    if (!res.ok) {
-      const errorMessage = await res.text();
-      console.error(`Error: ${errorMessage}`);
-      return;
-    }
-    const data = await res.json();
-    console.log(data);
-
-    // Update the address in the existing list
-    const updatedAddresses = userFormData.existingAddress.map((addr) =>
-      addr.id === addressId ? userFormData.Address : addr
-    );
-
-    setUserFormData((prevFormData) => ({
-      ...prevFormData,
-      existingAddress: updatedAddresses,
-      Address: {
-        name: "",
-        email: "",
-        door: "",
-        apartment: "",
-        landmark: "",
-        city: "",
-        pincode: "",
-        phone: "",
-        id: null,
-      },
-      isAddressSaved: true,
-    }));
-  };
-
-  const handleEditClick = (addressId) => {
-    const addressToEdit = userFormData.existingAddress.find((addr) => addr.id === addressId);
-    if (addressToEdit) {
-      setUserFormData((prevFormData) => ({
-        ...prevFormData,
-        Address: {
-            ...addressToEdit,
-            id: addressId,
-            email: userFormData.Address.email,
-            name: addressToEdit.person,
-            phone: addressToEdit.mobile,
-         },
-        isAddressSaved: false,
-      }));
-    }
-  };
-
-  const me = async() => {
+  const me = async () => {
     const response = await fetch(`${base_url}/store/${brand_id}/auth/me`, {
       headers: {
-        "session": getSessionId(),
+        session: getSessionId(),
       },
     });
+
     if (!response.ok) {
       const errorMessage = await response.text();
       console.error(`Error: ${errorMessage}`);
       return;
     }
+
     const data = await response.json();
     console.log(data);
+
     // Set user details here
-    setUserFormData((prev)=> {
-        return {
-         ...prev,
-          Address: {
-            email: data.email,
-          },
-        }
-    })
-  }
+    setUserFormData((prev) => ({
+      ...prev,
+      Address: {
+        email: data.email,
+      },
+    }));
+  };
 
   useEffect(() => {
     fetchAddress();
-    me(); 
+    me();
   }, []);
 
   return (
@@ -219,13 +216,22 @@ export default function UserAddress() {
         <div className="flex flex-col gap-4">
           {userFormData.existingAddress.length > 0 ? (
             userFormData.existingAddress.map((address, index) => (
-              <div key={index} className="border p-4 rounded-lg bg-gray-50 shadow-md">
-                <p className="text-gray-700 font-bold capitalize">{address.person}</p>
-                <p className="text-gray-600 flex flex-wrap gap-2 align-middle font-semibold"><MdAddCall className="text-xl" /> {address.mobile}</p>
+              <div
+                key={index}
+                className="border p-4 rounded-lg bg-gray-50 shadow-md"
+              >
+                <p className="text-gray-700 font-bold capitalize">
+                  {address.person}
+                </p>
+                <p className="text-gray-600 flex flex-wrap gap-2 align-middle font-semibold">
+                  <MdAddCall className="text-xl" /> {address.mobile}
+                </p>
                 <p className="text-gray-600">
                   {address.door}, {address.apartment}, {address.landmark}
                 </p>
-                <p className="text-gray-600">{address.city}, {address.pinCode}</p>
+                <p className="text-gray-600">
+                  {address.city}, {address.pinCode}
+                </p>
                 {/* <Button
                   text="Edit"
                   onClick={() => handleEditClick(address.id)}
@@ -244,7 +250,17 @@ export default function UserAddress() {
           {userFormData.Address.id ? "Edit Address" : "Add New Address"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {["person", "mobile", "door", "apartment", "address", "landmark", "city", "pinCode"].map((field) => (
+          {[
+            "name",
+            "email",
+            "phone",
+            "door",
+            "apartment",
+            "address",
+            "landmark",
+            "city",
+            "pinCode",
+          ].map((field) => (
             <div key={field} className="flex flex-col">
               <label className="text-gray-700 capitalize">{field}</label>
               <input
@@ -254,18 +270,14 @@ export default function UserAddress() {
                 value={userFormData.Address[field]}
                 onChange={handleChange}
                 className="px-4 py-2 mt-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500"
-                required = {field === "landmark" ? "" : "required"}
+                required
               />
             </div>
           ))}
           <Button
-            type="submit"
             text={userFormData.Address.id ? "Update Address" : "Save Address"}
             disabled={isSaveBtnDisabled}
           />
-          {userFormData.isAddressSaved && (
-            <div className="text-green-500 mt-2">Address saved successfully!</div>
-          )}
         </form>
       </div>
     </div>
