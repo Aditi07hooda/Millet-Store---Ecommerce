@@ -6,56 +6,69 @@ import {
   CardFooter,
   Typography,
 } from "@material-tailwind/react";
-import { HeartIcon } from "@heroicons/react/24/outline";
 import Button from "../UI/Button";
 import { useRouter } from "next/router";
 import logo from "../../Image/logo.png";
-import Image from "next/image";
+import { addItemToCartAsync, fetchCartItemsAsync } from "@/store/slices/cart";
+import { useDispatch } from "react-redux";
 
 const Card = ({ product, categoryName }) => {
   const router = useRouter();
-  const [isHovered, setIsHovered] = useState(false);
+  const dispatch = useDispatch();
+
+  const [state, setState] = useState({
+    selectedVariant: null,
+    selectedSize: null,
+    isAddedToCart: false,
+  });
 
   const productImage =
     product.oneImg ||
     product.mainImage ||
-    (product.images && product.images[0]);
+    (product.images && product.images[0]) ||
+    logo.src;
+
   const productName = product.name || "No Name Available";
   const availableVariants = product.variants || [];
   const formattedVariants = availableVariants.map((variant) => ({
+    id: variant.id,
+    image: productImage,
     size: variant.name,
     price: variant.price,
     offerPrice: variant.offerPrice,
   }));
 
-  const getRandomHashtag = (keywords) => {
-    if (!keywords || keywords.length === 0) return "#NewArrivals";
-    const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)];
-    return `#${randomKeyword
-      .replace(/\s+/g, "")
-      .replace(/[^a-zA-Z0-9_]/g, "")}`;
-  };
-
-  const randomHashtag = getRandomHashtag(product.keywords);
-
   // Handle Add to Cart directly from the Card
-  const handleAddToCart = () => {};
+  const handleAddToCart = () => {
+    const cartItem = {
+      variantId: formattedVariants[0].id,
+      id: formattedVariants[0].id,
+      name: productName,
+      price: formattedVariants[0].price,
+      offerPrice: formattedVariants[0].offerPrice,
+      image: productImage,
+      size: formattedVariants[0].size,
+    };
+
+    localStorage.setItem(`image_${cartItem.id}`, cartItem.image);
+    dispatch(addItemToCartAsync(cartItem));
+    setState((prevState) => ({ ...prevState, isAddedToCart: true }));
+    dispatch(fetchCartItemsAsync());
+  };
 
   const handleProductClick = (slug) => {
     router.push(`/product/${slug}`);
   };
 
   return (
-    <div
-      className="relative group"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <CardLayout
-        className="bg-secondary bg-opacity-25 transition-transform duration-300 cursor-pointer"
-        onClick={() => handleProductClick(product.slug)}
-      >
-        <CardHeader shadow={"false"} floated={"false"} className="relative">
+    <div className="relative group">
+      <CardLayout className="bg-secondary bg-opacity-25 transition-transform duration-300 cursor-pointer">
+        <CardHeader
+          shadow={"false"}
+          floated={"false"}
+          className="relative"
+          onClick={() => handleProductClick(product.slug)}
+        >
           {productImage ? (
             <img
               src={productImage}
@@ -65,10 +78,14 @@ const Card = ({ product, categoryName }) => {
               // objectFit="cover"
             />
           ) : (
-            <Image alt="The millet store" src={logo} className="h-auto max-w-full w-max rounded-lg" />
+            <img
+              alt="The millet store"
+              src={logo.src}
+              className="h-auto max-w-full w-max rounded-lg"
+            />
           )}
         </CardHeader>
-        <CardBody>
+        <CardBody onClick={() => handleProductClick(product.slug)}>
           <div className="mb-1 flex items-center justify-between">
             <Typography color="gray" className="font-small text-gray-400">
               {categoryName}
@@ -104,16 +121,14 @@ const Card = ({ product, categoryName }) => {
             </div>
           )}
         </CardBody>
-        {isHovered ? (
-          <CardFooter className="pt-0 transition-opacity duration-300 flex justify-between align-middle">
-            <Button text={"Add to Cart"} onClick={handleAddToCart} />
-            <HeartIcon className="h-6 w-6 hover:fill-primary cursor-pointer" />
-          </CardFooter>
-        ) : (
-          <span className="inline-block bg-gray-200 rounded-full transition-opacity duration-300 px-3 py-1 ml-3 text-sm font-semibold text-gray-700 mr-2 mb-2">
-            {randomHashtag}
-          </span>
-        )}
+        <CardFooter className="pt-0 transition-opacity duration-300 flex justify-between align-middle">
+          <Button text={"Add to Cart"} onClick={handleAddToCart} />
+          {state.isAddedToCart && (
+            <span className="inline-block text-green-500 transition-opacity duration-300 px-3 py-1 text-xs font-semibold">
+              Added to Cart
+            </span>
+          )}
+        </CardFooter>
       </CardLayout>
     </div>
   );

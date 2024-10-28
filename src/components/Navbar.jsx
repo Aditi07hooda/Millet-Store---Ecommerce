@@ -11,15 +11,13 @@ import {
   MenuItem,
   MenuItems,
 } from "@headlessui/react";
-import { Bars3Icon, HeartIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useSelector } from "react-redux";
-import Badge, { BadgeProps } from "@mui/material/Badge";
+import Badge from "@mui/material/Badge";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import SearchBar from "./UI/SearchBar";
-import { current } from "@reduxjs/toolkit";
 
 const Navbar = () => {
   const cartItems = useSelector((state) => state.cart.items);
@@ -27,9 +25,9 @@ const Navbar = () => {
 
   const navigation = [
     { name: "Blog", href: "/blog", current: false },
+    {name: "Collections", href: "/collections", current: false},
     { name: "About us", href: "/about", current: false },
     { name: "Contact us", href: "/contact", current: false },
-    {name: "Collections", href: "/collections", current: false},
   ];
 
   function classNames(...classes) {
@@ -104,14 +102,6 @@ const Navbar = () => {
                   ))}
                 </div>
               </div>
-              <button
-                type="button"
-                className="relative rounded-full p-1 text-gray-900 hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 hidden sm:block"
-              >
-                <span className="absolute -inset-1.5" />
-                <span className="sr-only">Wishlist</span>
-                <HeartIcon aria-hidden="true" className="h-6 w-6" />
-              </button>
 
               <Link href="/cart" className="hidden sm:block">
                 <IconButton aria-label="cart">

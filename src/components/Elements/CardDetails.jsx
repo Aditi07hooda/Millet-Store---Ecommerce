@@ -4,6 +4,7 @@ import Button from "../UI/Button";
 import { useDispatch } from "react-redux";
 import { addItemToCartAsync } from "../../store/slices/cart";
 import { getSessionId } from "@/store/LocalStorage";
+import logo from "../../Image/logo.png";
 
 const CardDetails = ({ product }) => {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const CardDetails = ({ product }) => {
     variantMatrix = {},
   } = product;
 
-  const productImage = oneImg || mainImage || images[0];
+  const productImage = oneImg || mainImage || images[0] || logo.src;
   const variantType = variantTypes[0];
   const availableProductSize = Object.values(variantMatrix[variantType] || {});
 

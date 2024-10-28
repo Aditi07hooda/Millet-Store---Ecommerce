@@ -18,28 +18,29 @@ const Cart = () => {
     discountApplied: false,
     discountError: "",
     discount: 0,
+    hasFetchedOnce: false,
   });
+
   const cartItems = useSelector((state) => state.cart.items);
   const totalQuantity = useSelector((state) => state.cart.totalQuantity);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
-  const totalPrice = totalAmount - state.discount;
 
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
-  // handle diablity of checkout and discount button
   useEffect(() => {
-    if (totalQuantity > 0) {
-      setState((prev) => ({
-        ...prev,
-        disable: false,
-      }));
-    } else {
-      setState((prev) => ({
-        ...prev,
-        disable: true,
-      }));
+    if (!state.hasFetchedOnce) {
+      dispatch(fetchCartItemsAsync()).then(() => {
+        setState((prev) => ({ ...prev, hasFetchedOnce: true }));
+      });
     }
+  }, [state.hasFetchedOnce, dispatch]);
+
+  useEffect(() => {
+    setState((prev) => ({
+      ...prev,
+      disable: totalQuantity === 0,
+    }));
   }, [totalQuantity]);
 
   const handleDiscountChange = (e) => {
@@ -50,23 +51,17 @@ const Cart = () => {
   };
 
   const handleApplyDiscount = async () => {
-    console.log(state.discountInput);
     try {
       const res = await fetch(
         `${base_url}/store/${brand_id}/auth/checkout/discount`,
         {
           method: "POST",
-          headers: {
-            session: getSessionId(),
-          },
+          headers: { session: getSessionId() },
           body: JSON.stringify({ code: state.discountInput }),
         }
       );
-      if (!res.ok) {
-        throw new Error("Failed to apply discount");
-      }
+      if (!res.ok) throw new Error("Failed to apply discount");
       const data = await res.json();
-      console.log("Discount applied successfully", data);
       setState((prev) => ({
         ...prev,
         discountInput: "",
@@ -74,9 +69,7 @@ const Cart = () => {
         discountError: "",
         discount: data.discountAmt,
       }));
-      // Update total amount after discount code
     } catch (error) {
-      console.error(error);
       setState((prev) => ({
         ...prev,
         discountInput: "",
@@ -87,70 +80,54 @@ const Cart = () => {
   };
 
   const handleAutomaticDiscount = async () => {
-    const res = await fetch(`${base_url}/store/${brand_id}/discounts/automatic`,{
-      method: "GET",
-      headers: {
-        session: getSessionId(),
-      },
-    })
-    if (!res.ok) {
-      throw new Error("Failed to fetch automatic discount");
-    }
-    const data = await res.json();
-    console.log("Automatic discount fetched successfully", data);
-    console.log("automatic discount", totalAmount , data.discount.minOrder)
-    if(totalAmount > data.discount.minOrder){
-      if(data.discount.discountType === "PERCENT"){
-        let disValue = (data.discount.discountVal/100) * totalAmount;
-        if(disValue > data.discount.maxDiscount){
-          disValue = data.discount.maxDiscount;
+    try {
+      const res = await fetch(
+        `${base_url}/store/${brand_id}/discounts/automatic`,
+        {
+          method: "GET",
+          headers: { session: getSessionId() },
         }
+      );
+      if (!res.ok) throw new Error("Failed to fetch automatic discount");
+
+      const data = await res.json();
+      if (totalAmount > data.discount.minOrder) {
+        let discountValue =
+          data.discount.discountType === "PERCENT"
+            ? Math.min(
+                (data.discount.discountVal / 100) * totalAmount,
+                data.discount.maxDiscount
+              )
+            : data.discount.discountVal;
+
         setState((prev) => ({
-         ...prev,
-          discount: disValue,
-        }));
-      }else{
-        setState((prev) => ({
-         ...prev,
-          discountInput: data.discountCode,
-          discountApplied: true,
-          discount: data.discount.discountVal,
+          ...prev,
+          discount: discountValue,
         }));
       }
+    } catch (error) {
+      console.error("Failed to fetch automatic discount", error);
     }
-  }
-  console.log("discount value", state.discount)
+  };
 
-  // Fetch cart items on component mount
   useEffect(() => {
-    dispatch(fetchCartItemsAsync());
-  }, []);
-
-  useEffect(()=>{
     handleAutomaticDiscount();
-  },[totalAmount])
+  }, [totalAmount]);
 
   const handleIncreaseQuantity = (item) => {
-    console.log(item);
     dispatch(addItemToCartAsync(item));
-    dispatch(fetchCartItemsAsync());
   };
 
   const handleDecreaseQuantity = (item) => {
-    // console.log(item)
-    if (item.qty > 0) {
+    if (item.qty > 1) {
+      dispatch(removeItemFromCartAsync(item));
+    } else if (item.qty === 1) {
       dispatch(removeItemFromCartAsync(item));
     }
-    dispatch(fetchCartItemsAsync());
-  };
-
-  const handleRemoveItem = (item) => {
-    dispatch(removeItemFromCartAsync({ id: item.id, size: item.size }));
   };
 
   return (
     <div className="flex flex-col md:flex-row justify-between p-6 max-w-5xl mx-auto">
-      {/* Cart Section */}
       <div className="w-full md:w-2/3">
         <h2 className="text-lg font-semibold mb-4">Shopping Cart</h2>
         {cartItems.length === 0 ? (
@@ -158,12 +135,11 @@ const Cart = () => {
         ) : (
           cartItems.map((item) => (
             <div
-              key={`${item.id}-${item.size}`}
+              key={`${item.id || "unknown"}-${item.size || "unknown"}`}
               className="flex px-4 py-3 border rounded mb-4 flex-col"
             >
-              {/* Product Image and Details */}
               <div className="flex items-center justify-between">
-                <Image
+                <img
                   src={item.image || ""}
                   alt={item.name}
                   className="w-20 h-20 object-cover rounded mr-4"
@@ -175,7 +151,6 @@ const Cart = () => {
                   <p className="text-gray-600 text-sm">
                     Size: {item.variantName}
                   </p>
-                  {/* Price and Quantity */}
                   <div className="flex flex-col">
                     <span className="text-gray-800 mr-6 font-bold">
                       Rs. {(item.price * item.qty).toFixed(2)}
