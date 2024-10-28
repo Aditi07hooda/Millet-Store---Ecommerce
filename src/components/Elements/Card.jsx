@@ -9,6 +9,8 @@ import {
 import { HeartIcon } from "@heroicons/react/24/outline";
 import Button from "../UI/Button";
 import { useRouter } from "next/router";
+import logo from "../../Image/logo.png";
+import Image from "next/image";
 
 const Card = ({ product, categoryName }) => {
   const router = useRouter();
@@ -54,7 +56,7 @@ const Card = ({ product, categoryName }) => {
         onClick={() => handleProductClick(product.slug)}
       >
         <CardHeader shadow={"false"} floated={"false"} className="relative">
-          {productImage && (
+          {productImage ? (
             <img
               src={productImage}
               alt={productName}
@@ -62,6 +64,8 @@ const Card = ({ product, categoryName }) => {
               //layout="fill"
               // objectFit="cover"
             />
+          ) : (
+            <Image alt="The millet store" src={logo} className="h-auto max-w-full w-max rounded-lg" />
           )}
         </CardHeader>
         <CardBody>

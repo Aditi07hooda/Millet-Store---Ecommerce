@@ -116,7 +116,7 @@ export default function UserAddress() {
   const updateAddress = async (addressId) => {
     console.log("update address ",userFormData.Address);
     const res = await fetch(`${base_url}/store/${brand_id}/auth/address/${addressId}`, {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         session: getSessionId(),
@@ -226,10 +226,10 @@ export default function UserAddress() {
                   {address.door}, {address.apartment}, {address.landmark}
                 </p>
                 <p className="text-gray-600">{address.city}, {address.pinCode}</p>
-                <Button
+                {/* <Button
                   text="Edit"
                   onClick={() => handleEditClick(address.id)}
-                />
+                /> */}
               </div>
             ))
           ) : (

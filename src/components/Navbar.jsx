@@ -60,7 +60,7 @@ const Navbar = () => {
               <Link href="/">
                 <div className="flex flex-shrink-0 items-center cursor-pointer">
                   <Image
-                    alt="Your Company"
+                    alt="The Millet Store"
                     src={logo}
                     className="h-10 w-auto"
                   />
