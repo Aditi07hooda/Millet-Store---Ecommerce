@@ -86,14 +86,54 @@ const Cart = () => {
     }
   };
 
+  const handleAutomaticDiscount = async () => {
+    const res = await fetch(`${base_url}/store/${brand_id}/discounts/automatic`,{
+      method: "GET",
+      headers: {
+        session: getSessionId(),
+      },
+    })
+    if (!res.ok) {
+      throw new Error("Failed to fetch automatic discount");
+    }
+    const data = await res.json();
+    console.log("Automatic discount fetched successfully", data);
+    console.log("automatic discount", totalAmount , data.discount.minOrder)
+    if(totalAmount > data.discount.minOrder){
+      if(data.discount.discountType === "PERCENT"){
+        let disValue = (data.discount.discountVal/100) * totalAmount;
+        if(disValue > data.discount.maxDiscount){
+          disValue = data.discount.maxDiscount;
+        }
+        setState((prev) => ({
+         ...prev,
+          discount: disValue,
+        }));
+      }else{
+        setState((prev) => ({
+         ...prev,
+          discountInput: data.discountCode,
+          discountApplied: true,
+          discount: data.discount.discountVal,
+        }));
+      }
+    }
+  }
+  console.log("discount value", state.discount)
+
   // Fetch cart items on component mount
   useEffect(() => {
     dispatch(fetchCartItemsAsync());
   }, []);
 
+  useEffect(()=>{
+    handleAutomaticDiscount();
+  },[totalAmount])
+
   const handleIncreaseQuantity = (item) => {
     console.log(item);
     dispatch(addItemToCartAsync(item));
+    dispatch(fetchCartItemsAsync());
   };
 
   const handleDecreaseQuantity = (item) => {
@@ -101,6 +141,7 @@ const Cart = () => {
     if (item.qty > 0) {
       dispatch(removeItemFromCartAsync(item));
     }
+    dispatch(fetchCartItemsAsync());
   };
 
   const handleRemoveItem = (item) => {
@@ -182,7 +223,7 @@ const Cart = () => {
                 Discount code applied successfully.
               </p>
               <p className="text-gray-600 text-sm">
-                Discount: -Rs. {state.discount.toFixed(2)}
+                Discount: -Rs. {state.discount}
               </p>
             </>
           ) : (
@@ -210,7 +251,7 @@ const Cart = () => {
             </li>
             <li className="flex justify-between">
               <span>Discount</span>
-              <span>Rs. {state.discount.toFixed(2)}</span>
+              <span>Rs. {state.discount}</span>
             </li>
             <li className="flex justify-between border-t pt-2">
               <span>Total</span>

@@ -4,12 +4,14 @@ import Card from "./Card";
 export default function CollectionsProduct({ collection, collectionProducts }) {
   return (
     <>
-      <h3>{collection.name}</h3>
-      {collectionProducts.map((product) => (
-        <div key={product.id}>
-          <Card product={product} categoryName={collection.name} />
-        </div>
-      ))}
+      <div className="p-3">
+        <h3 className="text-xl font-semibold mb-3">{collection.name}</h3>
+        {collectionProducts.map((product) => (
+          <div key={product.id}>
+            <Card product={product} categoryName={collection.name} />
+          </div>
+        ))}
+      </div>
     </>
   );
 }

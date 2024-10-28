@@ -17,7 +17,7 @@ export default function collectionPage({ collection, products }) {
   );
 }
 
-export async function getStaticPaths() {
+export const getStaticPaths = async() => {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
@@ -40,10 +40,10 @@ export async function getStaticPaths() {
 
   console.log(paths)
 
-  return { paths, fallback: false };
+  return { paths, fallback: 'blocking' };
 }
 
-export async function getStaticProps({ params }) {
+export const getStaticProps = async({ params }) => {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
   const { slug } = params;

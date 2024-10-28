@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchCartItemsAsync } from "../../store/slices/cart";
 import Image from "next/image";
 import useRazorpay from "react-razorpay-integration";
+import Link from "next/link";
 
 export default function Checkout() {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ export default function Checkout() {
     error: null,
     order_id: "",
     isPaymentFailure: false,
+    userLoggedIn: false,
   });
 
   const handleGetAddress = async () => {
@@ -33,11 +35,18 @@ export default function Checkout() {
           session: getSessionId(),
         },
       });
-      if (!res.ok) throw new Error("Failed to fetch addresses");
+      if (!res.ok) {
+        setState((prev) => ({
+          ...prev,
+          userLoggedIn: false,
+        }));
+        throw new Error("Failed to fetch addresses");
+      }
       const data = await res.json();
       setState((prevState) => ({
         ...prevState,
         addresses: data,
+        userLoggedIn: true,
       }));
     } catch (error) {
       console.error("Error fetching address in checkout: ", error);
@@ -99,13 +108,7 @@ export default function Checkout() {
 
       let rzp1 = new Razorpay(data);
       rzp1.on("payment.failed", async (response) => {
-        console.error("Payment failed:", response.error.code);
-        console.error("payment error", response.error.description);
-        console.error("payment error", response.error.source);
-        console.error("payment error", response.error.step);
-        console.error("payment error", response.error.reason);
-        console.error("payment error", response.error.metadata.order_id);
-        console.error("payment error", response.error.metadata.payment_id);
+        console.error("Payment failed:", response.error);
         await handlePaymentCancel(
           "payment failed",
           response.error.metadata.order_id
@@ -212,35 +215,48 @@ export default function Checkout() {
       <div className="cursor-default">
         <h2 className="text-xl font-semibold mb-4">Select Address</h2>
         <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-          {state.addresses.map((address) => (
-            <div
-              key={address.id}
-              className={`border p-4 rounded-lg bg-gray-50 shadow-md flex justify-between items-start gap-4 ${
-                state.selectedAddress?.id === address.id
-                  ? "border-2 border-green-500"
-                  : ""
-              }`}
-            >
-              <div>
-                <p className="text-gray-700 font-bold capitalize">
-                  {address.person}
-                </p>
-                <p className="text-gray-600 flex items-center gap-2 font-semibold">
-                  <MdAddCall className="text-xl" /> {address.mobile}
-                </p>
-                <p className="text-gray-600">
-                  {address.door}, {address.apartment}, {address.landmark}
-                </p>
-                <p className="text-gray-600">
-                  {address.city}, {address.pinCode}
-                </p>
-              </div>
-              <Button
-                text="Select"
-                onClick={() => handleSelectAddress(address)}
-              />
-            </div>
-          ))}
+          {state.userLoggedIn ? (
+            <>
+              {state.addresses.map((address) => (
+                <div
+                  key={address.id}
+                  className={`border p-4 rounded-lg bg-gray-50 shadow-md flex justify-between items-start gap-4 ${
+                    state.selectedAddress?.id === address.id
+                      ? "border-2 border-green-500"
+                      : ""
+                  }`}
+                >
+                  <div>
+                    <p className="text-gray-700 font-bold capitalize">
+                      {address.person}
+                    </p>
+                    <p className="text-gray-600 flex items-center gap-2 font-semibold">
+                      <MdAddCall className="text-xl" /> {address.mobile}
+                    </p>
+                    <p className="text-gray-600">
+                      {address.door}, {address.apartment}, {address.landmark}
+                    </p>
+                    <p className="text-gray-600">
+                      {address.city}, {address.pinCode}
+                    </p>
+                  </div>
+                  <Button
+                    text="Select"
+                    onClick={() => handleSelectAddress(address)}
+                  />
+                </div>
+              ))}
+            </>
+          ) : (
+            <>
+              <p className="text-red-600 flex gap-3 flex-wrap">
+                Please login to access your addresses and proceed with checkout.
+                <Link href="/user/account">
+                  <Button text={"Login"} />
+                </Link>
+              </p>
+            </>
+          )}
         </div>
       </div>
 
@@ -311,7 +327,7 @@ export default function Checkout() {
       <Button
         text={state.loading ? "Processing..." : "Place Order"}
         onClick={handleStartPayment}
-        disabled={state.loading}
+        disabled={state.loading || !state.userLoggedIn}
       />
     </div>
   );

@@ -1,9 +1,15 @@
-import Footer from "@/components/Footer";
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Product from "@/components/Product";
+import { useDispatch } from "react-redux";
+import { fetchCartItemsAsync } from "@/store/slices/cart";
 
 
 export default function Home() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchCartItemsAsync());
+  }, []);
 
   return (
     <>
