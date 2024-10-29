@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import logo from "../../Image/logo.png";
 import { addItemToCartAsync, fetchCartItemsAsync } from "@/store/slices/cart";
 import { useDispatch } from "react-redux";
+import Image from "next/image";
 
 const Card = ({ product, categoryName }) => {
   const router = useRouter();
@@ -61,27 +62,29 @@ const Card = ({ product, categoryName }) => {
   };
 
   return (
-    <div className="relative group">
+    <div className="h-100">
       <CardLayout className="bg-secondary bg-opacity-25 transition-transform duration-300 cursor-pointer">
         <CardHeader
           shadow={"false"}
           floated={"false"}
-          className="relative"
+          className="h-52 w-auto relative flex flex-wrap"
           onClick={() => handleProductClick(product.slug)}
         >
           {productImage ? (
-            <img
+            <Image
               src={productImage}
               alt={productName}
               className="h-auto max-w-full w-max rounded-lg"
-              //layout="fill"
-              // objectFit="cover"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <img
+            <Image
               alt="The millet store"
               src={logo.src}
               className="h-auto max-w-full w-max rounded-lg"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           )}
         </CardHeader>

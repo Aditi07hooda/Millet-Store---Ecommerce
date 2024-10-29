@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import DOMPurify from "dompurify";
+import Image from "next/image";
 
 export default function SearchPage() {
   const router = useRouter();
@@ -76,21 +77,25 @@ export default function SearchPage() {
                 <CardHeader
                   shadow={"false"}
                   floated={"false"}
-                  className="relative"
+                  className="relative lg:h-64 w-auto h-72 md:h-[20rem]"
                 >
                   {result.oneImg ? (
-                    <img
+                    <Image
                       src={result.oneImg}
                       alt={result.name}
                       className="h-auto max-w-full w-max rounded-lg"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       //layout="fill"
                       // objectFit="cover"
                     />
                   ) : (
-                    <img
+                    <Image
                       alt="The millet store"
                       src={logo.src}
                       className="h-auto max-w-full w-max rounded-lg"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   )}
                 </CardHeader>

@@ -2,6 +2,7 @@ import React from "react";
 import Loader from "../UI/Loader";
 import { getBannerWebImage } from "@/store/LocalStorage";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 const Carousel = () => {
   const router = useRouter();
@@ -19,13 +20,16 @@ const Carousel = () => {
         {images.map((image, index) => (
           <div
             key={index}
-            className={``}
+            className="h-48 lg:h-[26rem] md:h-[23rem] relative"
             onClick={() => router.push(imageLinkTo[0])}
           >
-            <img
+            <Image
               src={image}
               alt={`Slide ${index}`}
               className="w-full h-full object-cover rounded-lg"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority
             />
           </div>
         ))}

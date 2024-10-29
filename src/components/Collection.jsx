@@ -8,6 +8,7 @@ import {
   CardFooter,
   Typography,
 } from "@material-tailwind/react";
+import Image from "next/image";
 
 export default function Collection() {
   const router = useRouter();
@@ -53,11 +54,17 @@ export default function Collection() {
               >
                 <CardLayout className="bg-secondary bg-opacity-25">
                   <CardHeader>
-                    <Typography variant="h3" className="font-semibold truncate">{collection.name}</Typography>
+                    <Typography variant="h3" className="font-semibold truncate">
+                      {collection.name}
+                    </Typography>
                   </CardHeader>
                   <CardBody>
-                    {(collection.image_url === undefined || collection.image_url === null) ? "" : (
-                        <img
+                    {collection.image_url === undefined ||
+                    collection.image_url === null ? (
+                      ""
+                    ) : (
+                      <div className="h-52">
+                        <Image
                           src={
                             collection.image_url === null
                               ? ""
@@ -65,7 +72,10 @@ export default function Collection() {
                           }
                           alt={collection.name}
                           className="w-full h-auto object-cover"
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         />
+                      </div>
                     )}
                   </CardBody>
                   <CardFooter>
