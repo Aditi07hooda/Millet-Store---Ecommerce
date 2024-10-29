@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from './Elements/Card';
+import Card from './Elements/ProductCard';
 import DOMPurify from 'dompurify';
 
 export default function CategoryBasedProduct({ products, categoryName, categoryDescription }) {

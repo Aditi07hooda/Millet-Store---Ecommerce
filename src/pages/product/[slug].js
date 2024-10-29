@@ -1,7 +1,8 @@
 import React from "react";
 import { useRouter } from "next/router";
-import CardDetails from "@/components/Elements/CardDetails";
+import CardDetails from "@/components/Elements/ProductCardDetails";
 import { getSessionId } from "@/store/LocalStorage";
+import Loader from "@/components/UI/Loader";
 
 export default function ProductPage({ products }) {
   const router = useRouter();

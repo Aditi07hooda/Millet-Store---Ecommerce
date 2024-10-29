@@ -38,6 +38,8 @@ export default function Orders() {
     }
   };
 
+  // console.log("order details",orders.orderDetails[0].orderDateStr)
+
   // Fetch order details for a specific order
   const getOrderDetails = async (orderId) => {
     try {
@@ -92,7 +94,7 @@ export default function Orders() {
                 {order.status}
               </p>
               <p className="text-sm text-gray-500">
-                {new Date(order.date).toLocaleDateString()}
+                {order.date}
               </p>
             </div>
             <hr className="my-3" />

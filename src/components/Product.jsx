@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Card from "./Elements/Card";
+import Card from "./Elements/ProductCard";
 import Loader from "./UI/Loader";
 import { getSessionId } from "@/store/LocalStorage";
 

@@ -4,13 +4,6 @@ import Loader from "./UI/Loader";
 import { useRouter } from "next/router";
 import { getSessionId, getUserData, setUserData } from "@/store/LocalStorage";
 import {
-  Tabs,
-  TabsHeader,
-  TabsBody,
-  Tab,
-  TabPanel,
-} from "@material-tailwind/react";
-import {
   Square3Stack3DIcon,
   UserCircleIcon,
   Cog6ToothIcon,
@@ -226,12 +219,8 @@ const User = () => {
             />
           </form>
         )}
-        {profileTab === "Address" && (
-          <UserAddress />
-        )}
-        {profileTab === "Orders" && (
-          <Orders />
-        )}
+        {profileTab === "Address" && <UserAddress />}
+        {profileTab === "Orders" && <Orders />}
       </div>
     </>
   );

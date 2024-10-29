@@ -18,10 +18,13 @@ import Badge from "@mui/material/Badge";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { getUserData } from "@/store/LocalStorage";
 
 const Navbar = () => {
   const cartItems = useSelector((state) => state.cart.items);
   const cartCount = String(cartItems.length);
+
+  const userPresent = getUserData() ? true : false;
 
   const navigation = [
     { name: "Blog", href: "/blog", current: false },
@@ -130,16 +133,18 @@ const Navbar = () => {
                 >
                   <Link href="/user/account">
                     <span className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-primary data-[focus]:text-white">
-                      Your Profile
+                      {userPresent ? "My Profile" : "Log In / Sign Up"}
                     </span>
                   </Link>
-                  <MenuItem>
-                    <Link href="/user/account" onClick={logoutHandler}>
-                      <span className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-primary data-[focus]:text-white">
-                        Sign out
-                      </span>
-                    </Link>
-                  </MenuItem>
+                  {userPresent && (
+                    <MenuItem>
+                      <Link href="/user/account" onClick={logoutHandler}>
+                        <span className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-primary data-[focus]:text-white">
+                          Sign out
+                        </span>
+                      </Link>
+                    </MenuItem>
+                  )}
                 </MenuItems>
               </Menu>
             </div>
