@@ -2,11 +2,19 @@ import React, { useEffect, useState } from "react";
 import Card from "./Elements/ProductCard";
 import Loader from "./UI/Loader";
 import { getSessionId } from "@/store/LocalStorage";
+import { useRouter } from "next/router";
+import dynamic from 'next/dynamic'
+
+const Button = dynamic(() => import('./UI/Button'), {
+  loading: () => <Loader />,
+})
+
 
 const Product = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const router = useRouter();
 
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
@@ -46,6 +54,16 @@ const Product = () => {
     return acc;
   }, {});
 
+  const handleViewMore = async(name) => {
+    const categoryRes = await fetch(`${base_url}/store/${brand_id}/categories`, {
+      headers: { session: getSessionId() },
+    });
+    const categories = await categoryRes.json();
+    const category = categories.find((cat) => cat.name === name);
+    const slug = category.slug;
+    router.push(`/category/${slug}`);
+  }
+
   return (
     <div>
       {Object.keys(categorizedProducts).length > 0 ? (
@@ -53,11 +71,18 @@ const Product = () => {
           <section key={categoryName} className="mb-8">
             <h2 className="text-xl font-semibold mb-4">{categoryName}</h2>
             <div className="grid grid-flow-row lg:grid-cols-5 lg:gap-3 grid-cols-2 gap-2">
-              {products.map((product) => (
-                <div key={product.id}>
-                  <Card product={product} categoryName={categoryName} />
-                </div>
+              {products.slice(0, 8).map((product) => (
+                <>
+                  <div key={product.id}>
+                    <Card product={product} categoryName={categoryName} />
+                  </div>
+                </>
               ))}
+              {products.length - 8 > 0 && (
+                <div className="flex items-end">
+                  <Button text={"View More Products"} onClick={()=>handleViewMore(categoryName)} />
+                </div>
+              )}
             </div>
           </section>
         ))

@@ -8,8 +8,15 @@ import {
   UserCircleIcon,
   Cog6ToothIcon,
 } from "@heroicons/react/24/solid";
-import UserAddress from "./Elements/UserAddress.jsx";
-import Orders from "./Elements/Orders";
+import dynamic from 'next/dynamic'
+
+const UserAddress = dynamic(() => import('./Elements/UserAddress.jsx'), {
+  loading: () => <Loader />,
+})
+
+const Orders = dynamic(() => import('./Elements/Orders.jsx'), {
+  loading: () => <Loader />,
+})
 
 const User = () => {
   const [userFormData, setUserFormData] = useState({

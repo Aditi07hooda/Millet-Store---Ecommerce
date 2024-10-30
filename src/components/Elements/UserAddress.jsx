@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Button from "../UI/Button";
 import { getSessionId } from "@/store/LocalStorage";
 import { MdAddCall } from "react-icons/md";
+import Loader from "../UI/Loader";
 
 export default function UserAddress() {
   const [userFormData, setUserFormData] = useState({
@@ -19,10 +20,12 @@ export default function UserAddress() {
     },
     existingAddress: [],
     isAddressSaved: false,
+    isLoading: false,
+    error: null,
   });
 
   const isSaveBtnDisabled = !Object.values(userFormData.Address).every(
-    (field) => field !== "" || field === null 
+    (field) => field !== "" || field === null
   );
 
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -49,37 +52,60 @@ export default function UserAddress() {
   };
 
   const saveAddress = async () => {
-    console.log("save address", userFormData.Address);
-    const res = await fetch(`${base_url}/store/${brand_id}/auth/address`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        session: getSessionId(),
-      },
-      body: JSON.stringify({
-        ...userFormData.Address,
-        pincode: userFormData.Address.pinCode,
-        name: userFormData.Address.name,
-        phone: userFormData.Address.phone,
-      }),
+    // console.log("save address", userFormData.Address);
+    setUserFormData((prev) => {
+      return {
+        ...prev,
+        isLoading: true,
+        error: null,
+      };
     });
+    try {
+      const res = await fetch(`${base_url}/store/${brand_id}/auth/address`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          session: getSessionId(),
+        },
+        body: JSON.stringify({
+          ...userFormData.Address,
+          pincode: userFormData.Address.pinCode,
+          name: userFormData.Address.name,
+          phone: userFormData.Address.phone,
+        }),
+      });
 
-    if (!res.ok) {
-      const errorMessage = await res.text();
-      console.error(`Error: ${errorMessage}`);
-      return;
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        console.error(`Error: ${errorMessage}`);
+        return;
+      }
+
+      const data = await res.json();
+      console.log(data);
+
+      // Clear the form data after saving
+      resetForm();
+      setUserFormData((prevFormData) => ({
+        ...prevFormData,
+        existingAddress: [
+          ...prevFormData.existingAddress,
+          userFormData.Address,
+        ],
+        isAddressSaved: true,
+      }));
+    } catch (error) {
+      console.error("Error saving address: ", error);
+      setUserFormData((prevFormData) => ({
+        ...prevFormData,
+        error: error.message,
+      }));
+    } finally {
+      setUserFormData((prevFormData) => ({
+        ...prevFormData,
+        isLoading: false,
+      }));
     }
-
-    const data = await res.json();
-    console.log(data);
-
-    // Clear the form data after saving
-    resetForm();
-    setUserFormData((prevFormData) => ({
-      ...prevFormData,
-      existingAddress: [...prevFormData.existingAddress, userFormData.Address],
-      isAddressSaved: true,
-    }));
   };
 
   const updateAddress = async (addressId) => {
@@ -207,6 +233,10 @@ export default function UserAddress() {
     fetchAddress();
     me();
   }, []);
+
+  if (userFormData.isLoading) {
+    return <Loader />;
+  }
 
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between gap-8 py-6">

@@ -1,8 +1,15 @@
-import Login from '@/components/Login'
 import Button from '@/components/UI/Button';
-import User from '@/components/User'
 import { getUserData } from '@/store/LocalStorage';
 import React from 'react'
+import dynamic from 'next/dynamic'
+import Loader from '@/components/UI/Loader.jsx';
+
+const User = dynamic(() => import('../../components/User.jsx'), {
+  loading: () => <Loader />,
+})
+const Login = dynamic(()=> import('../../components/Login.jsx'),{
+  loading: () => <Loader />,
+})
 
 const profile = () => {
   const userPresent = getUserData() ? true : false;

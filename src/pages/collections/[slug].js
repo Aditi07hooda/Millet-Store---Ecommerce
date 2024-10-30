@@ -2,6 +2,7 @@ import React from "react";
 import { getSessionId } from "@/store/LocalStorage";
 import { useRouter } from "next/router";
 import CollectionsProduct from "@/components/Elements/CollectionsProduct";
+import Loader from "@/components/UI/Loader";
 
 export default function collectionPage({ collection, products }) {
   const router = useRouter();
