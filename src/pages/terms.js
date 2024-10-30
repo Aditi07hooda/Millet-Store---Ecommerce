@@ -8,7 +8,7 @@ const Terms = () => {
 
       <p className="mb-4">
         These terms and conditions outline the rules and regulations for the use
-        of Thirumathi Herbal & Natural Products's Website, located at
+        of Thirumathi Herbal & Natural Products&#39;s Website, located at
         themilletstore.in.
       </p>
 
@@ -20,10 +20,10 @@ const Terms = () => {
 
       <p className="mb-4">
         The following terminology applies to these Terms and Conditions, Privacy
-        Statement and Disclaimer Notice and all Agreements: "Client", "You" and
-        "Your" refers to you, the person log on this website and compliant to
-        the Company’s terms and conditions. "The Company", "Ourselves", "We",
-        "Our" and "Us", refers to our Company. "Party", "Parties", or "Us",
+        Statement and Disclaimer Notice and all Agreements: &#34;Client&#34;, &#34;You&#34; and
+        &#34;Your&#34; refers to you, the person log on this website and compliant to
+        the Company&#39;s terms and conditions. &#34;The Company&#34;, &#34;Ourselves&#34;, &#34;We&#34;,
+        &#34;Our&#34; and &#34;Us&#34;, refers to our Company. &#34;Party&#34;, &#34;Parties&#34;, or &#34;Us&#34;,
         refers to both the Client and ourselves. All terms refer to the offer,
         acceptance and consideration of payment necessary to undertake the
         process of our assistance to the Client in the most appropriate manner
@@ -39,7 +39,7 @@ const Terms = () => {
       <p className="mb-4">
         We employ the use of cookies. By accessing The Millet Store, you agreed
         to use cookies in agreement with the Thirumathi Herbal & Natural
-        Products's Privacy Policy.
+        Products&#39;s Privacy Policy.
       </p>
 
       <p className="mb-4">

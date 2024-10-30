@@ -10,6 +10,9 @@ const NotFound = () => {
       <div className="relative w-full max-w-md mb-6 lg:h-80 h-64">
         <Image src={error} alt="404" layout="fill" objectFit="contain" />
       </div>
+      <h1 className="text-5xl text-gray-500 font-thin items-start tracking-widest">
+        SORRY!!
+      </h1>
       <h1 className="text-4xl font-bold text-gray-800 mb-4">
         This page is gone.
       </h1>
