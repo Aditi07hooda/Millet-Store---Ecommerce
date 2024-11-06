@@ -3,12 +3,11 @@ import Card from "./Elements/ProductCard";
 import Loader from "./UI/Loader";
 import { getSessionId } from "@/store/LocalStorage";
 import { useRouter } from "next/router";
-import dynamic from 'next/dynamic'
+import dynamic from "next/dynamic";
 
-const Button = dynamic(() => import('./UI/Button'), {
+const Button = dynamic(() => import("./UI/Button"), {
   loading: () => <Loader />,
-})
-
+});
 
 const Product = () => {
   const [products, setProducts] = useState([]);
@@ -54,15 +53,18 @@ const Product = () => {
     return acc;
   }, {});
 
-  const handleViewMore = async(name) => {
-    const categoryRes = await fetch(`${base_url}/store/${brand_id}/categories`, {
-      headers: { session: getSessionId() },
-    });
+  const handleViewMore = async (name) => {
+    const categoryRes = await fetch(
+      `${base_url}/store/${brand_id}/categories`,
+      {
+        headers: { session: getSessionId() },
+      }
+    );
     const categories = await categoryRes.json();
     const category = categories.find((cat) => cat.name === name);
     const slug = category.slug;
     router.push(`/category/${slug}`);
-  }
+  };
 
   return (
     <div>
@@ -80,7 +82,10 @@ const Product = () => {
               ))}
               {products.length - 8 > 0 && (
                 <div className="flex items-end">
-                  <Button text={"View More Products"} onClick={()=>handleViewMore(categoryName)} />
+                  <Button
+                    text={"View More Products"}
+                    onClick={() => handleViewMore(categoryName)}
+                  />
                 </div>
               )}
             </div>

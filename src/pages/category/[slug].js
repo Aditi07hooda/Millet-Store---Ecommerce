@@ -59,7 +59,7 @@ export async function getStaticPaths() {
 // Fetch products for a specific category
 export async function getStaticProps({ params }) {
   const { slug } = params; // Get the slug from params
-  console.log(slug)
+  console.log(slug);
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 

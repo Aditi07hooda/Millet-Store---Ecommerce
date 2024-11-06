@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import dynamic from 'next/dynamic'
+import dynamic from "next/dynamic";
 import Loader from "@/components/UI/Loader";
 
-const BlogDetails = dynamic(() => import("@/components/Elements/BlogDetails"), { 
+const BlogDetails = dynamic(() => import("@/components/Elements/BlogDetails"), {
   loading: () => <Loader />,
 });
 
@@ -34,9 +34,13 @@ export default function BlogDetail() {
 
   return (
     <>
-    {blogData && (
-        <BlogDetails title={blogData.title} snippet={blogData.snippet} content={blogData.content} />
-    )}
+      {blogData && (
+        <BlogDetails
+          title={blogData.title}
+          snippet={blogData.snippet}
+          content={blogData.content}
+        />
+      )}
     </>
   );
 }

@@ -18,7 +18,7 @@ export default function collectionPage({ collection, products }) {
   );
 }
 
-export const getStaticPaths = async() => {
+export const getStaticPaths = async () => {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
 
@@ -39,12 +39,12 @@ export const getStaticPaths = async() => {
     params: { slug: collection.name },
   }));
 
-  console.log(paths)
+  console.log(paths);
 
-  return { paths, fallback: 'blocking' };
-}
+  return { paths, fallback: "blocking" };
+};
 
-export const getStaticProps = async({ params }) => {
+export const getStaticProps = async ({ params }) => {
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
   const brand_id = process.env.NEXT_PUBLIC_BRAND_ID;
   const { slug } = params;
@@ -59,7 +59,7 @@ export const getStaticProps = async({ params }) => {
     throw new Error(`Failed to fetch collections: ${res.status}`);
   }
   const collections = await res.json();
-  console.log(collections)
+  console.log(collections);
 
   const collection = collections.find((c) => c.name === slug);
 
@@ -91,4 +91,4 @@ export const getStaticProps = async({ params }) => {
     },
     revalidate: 60,
   };
-}
+};
